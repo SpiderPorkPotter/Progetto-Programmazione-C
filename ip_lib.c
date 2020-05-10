@@ -177,6 +177,97 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 }
 /*///////////////////FUNZIONI FEDERICO////////////////////*/
 
+/*//////////////Yamina & Christian FUNCTIONS//////////////*/
+/***     PARTE 1: OPERAZIONE MATEMATICHE FRA IP_MAT     ***/
+
+/*Sum of two ip_mat (all dimensions must be the same)*/
+ip_mat *ip_mat_sum (ip_mat *a, ip_mat *b)
+{
+    int liv, rig, col;
+    ip_mat *out; /*create the ip_mat output*/
+
+    out = NULL; /*initialize the new ip_mat*/
+
+    if(a->h == b->h && a->w == b->w && a->k == b->k) /*control if all dimensions are equal*/
+    {
+        for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
+            for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
+                for(col = 0; col < a->w; col++) /*cycle to scroll the width*/
+                    out->data[liv][rig][col] = a->data[liv][rig][col] + b->data[liv][rig][col];
+    }
+    return out;
+}
+
+/*Subtraction of two ip_mat (all dimensions must be the same)*/
+ip_mat *ip_mat_sub (ip_mat *a, ip_mat *b)
+{
+    int liv, rig, col;
+    ip_mat *out; /*create the ip_mat output*/
+
+    out = NULL; /*initialize the new ip_mat*/
+
+    if(a->h == b->h && a->w == b->w && a->k == b->k) /*control if all dimensions are equal*/
+    {
+        for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
+            for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
+                for(col = 0; col < a->w; col++) /*cycle to scroll the width*/
+                    out->data[liv][rig][col] = a->data[liv][rig][col] - b->data[liv][rig][col];
+    }
+    return out;
+}
+
+/*Multiply a scalar to a ip_mat*/
+ip_mat * ip_mat_mul_scalar (ip_mat *a, float c)
+{
+    int liv, rig, col;
+    ip_mat *out; /*create the ip_mat output*/
+
+    out = NULL; /*initialize the new ip_mat*/
+
+    for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
+        for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
+            for(col = 0; col < a->w; col++) /*cycle to scroll the width*/
+                out->data[liv][rig][col] = a->data[liv][rig][col] * c;
+
+    return out;
+}
+
+/*Add a scalar to a ip_mat*/
+ip_mat * ip_mat_add_scalar (ip_mat *a, float c)
+{
+    int liv, rig, col;
+    ip_mat *out; /*create the ip_mat output*/
+
+    out = NULL; /*initialize the new ip_mat*/
+
+    for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
+        for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
+            for(col = 0; col < a->w; col++) /*cycle to scroll the width*/
+                out->data[liv][rig][col] = a->data[liv][rig][col] + c;
+
+    return out;
+}
+
+/*Mean between two ip_mat*/
+/*    ????? Secondo voi è meglio usare la funzione ip_mat_sum ????	*/
+ip_mat * ip_mat_mean (ip_mat *a, ip_mat *b)
+{
+    int liv, rig, col;
+    ip_mat *out; /*create the ip_mat output*/
+
+    out = NULL; /*initialize the new ip_mat*/
+
+    if(a->h == b->h && a->w == b->w && a->k == b->k) /*control if all dimensions are equal*/
+    {
+        for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
+            for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
+                for(col = 0; col < a->w; col++) /*cycle to scroll the width*/
+                    out->data[liv][rig][col] = (a->data[liv][rig][col] + b->data[liv][rig][col])/2;
+    }
+    return out;
+}
+
+/*//////////////Yamina & Christian FUNCTIONS//////////////*/
 
 void ip_mat_show(ip_mat * t){
     unsigned int i,l,j;
