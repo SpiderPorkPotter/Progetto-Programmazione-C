@@ -177,6 +177,145 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 }
 /*///////////////////FUNZIONI FEDERICO////////////////////*/
 
+
+/* ###########################
+   Inizio funzioni parte 1 TOM
+   ########################### */
+
+/* IP MAT COPY - crea una copia di una ip_mat e lo restituisce in output */
+ip_mat * ip_mat_copy(ip_mat * in) {
+    ip_mat *x;  /* ho creato il puntatore ad una nuova struttura ip_mat */
+    unsigned int liv, rig, col;
+    /* ho richiamato la funzione create per assegnare le tre dimensioni ed allocare stats e data */
+    x = ip_mat_create(in->h, in->w, in->k, 1.0);
+
+    /* ora assegnamo i valori di data di in a x */
+    for ( liv=0; liv<in->k; liv++ ) {
+        for ( rig=0; rig<in->h; rig++ ) {
+            for ( col=0; col<in->w; col++ ) {
+                x->data[liv][rig][col] = in->data[liv][rig][col];
+            }
+        }
+    }
+
+    /* ora assegnamo i valori di stats di in a x */
+    for ( liv=0; liv<k; liv++ ) {
+        x->stat[liv].min = in->stat[liv].min;
+        x->stat[liv].max = in->stat[liv].max;
+        x->stat[liv].mean = in->stat[liv].mean;
+    }
+
+    return x;
+}
+
+
+ ip_mat * ip_mat_subset(ip_mat * t, unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end) {
+     ip_mat *x;  /* ho creato il puntatore ad una nuova struttura ip_mat */
+     unsigned int liv, rig, col;
+     x = NULL;
+
+     /* controlla se:
+        col e row end sono maggiori del loro corrispettivo starts
+        se entrambi gli start sono maggiori o uguali a zero
+        se entrambi gli end sono massimo grandi quanto quelli presenti in t
+     */
+     if ( (row_start <= row_end)  &&  (col_start <= col_end)  &&  (row_start >= 0)  &&  (col_start >= 0)  &&  (row_end <= t->h)  &&  (col_end <= w) ){
+
+         x = ip_mat_create( (row_end - row_start) , (col_end - col_start) ,t->k); /* istanzio la nuova truttura ip_mat con il numero di righe e colonne richieste */
+
+         /* ora vado a riempire le righe e colonne e k di data*/
+         for ( liv=0; liv<t->k; liv++ ) {
+             for ( rig=row_start; rig<row_end; rig++ ) {
+                 for ( col=col_start; col<col_end; col++ ) {
+                     x->data[liv][rig-row_start][col-col_start] = t->data[liv][rig][col];
+                 }
+             }
+         }
+
+         /* faccio elaborare gli stats */
+         compute_stats(x);
+     }
+
+
+     /* se non si entra nell'if vuol dire che c'è un problema e quindi restituisce NULL, altrimenti ritorna il puntatore del nuovo ip_mat */
+     return x;
+ }
+
+
+  ip_mat * ip_mat_concat(ip_mat * a, ip_mat * b, int dimensione) {
+      ip_max *x; /* ho creato il puntatore ad una nuova struttura ip_mat */
+      unsigned int liv, rig, col;
+      x = NULL;
+
+
+      /* concateno l'altezza */
+      if ( dimensione == 0 ) {
+          if ( (a->w == b->w)  &&  (a->k == b->k) ){
+            ip_mat_create( (a->h + b->h), a->w, a->k, 0.0 );
+            /* ora vado a riempire le righe e colonne e k di data*/
+                for ( liv=0; liv<x->k; liv++ ) {
+                    for ( rig=0; rig<x->h; rig++ ) {
+                        for ( col=0; col<x->w; col++ ) {
+                            if ( rig < a->h ) {
+                                x->data[liv][rig][col] = a->data[liv][rig][col];
+                            }
+                            else {
+                                x->data[liv][rig][col] = b->data[liv][rig-(a->h)][col];
+                            }
+                        }
+                    }
+                }
+            }
+      }
+
+      /* Concateno la larghezza */
+      if ( dimensione == 1 ) {
+          if ( (a->h == b->h)  &&  (a->k == b->k) ){
+            ip_mat_create( a->h, (a->w + b->w), a->k, 0.0 );
+            /* ora vado a riempire le righe e colonne e k di data*/
+                for ( liv=0; liv<x->k; liv++ ) {
+                    for ( rig=0; rig<x->h; rig++ ) {
+                        for ( col=0; col<x->w; col++ ) {
+                            if ( col < a->w ) {
+                                x->data[liv][rig][col] = a->data[liv][rig][col];
+                            }
+                            else {
+                                x->data[liv][rig][col] = b->data[liv][rig][col - (a->w)];
+                            }
+                        }
+                    }
+                }
+            }
+      }
+
+      /* Concateno la profondità (k) */
+      if ( dimensione == 2 ) {
+          if ( (a->h == b->h)  &&  (a->k == b->k) ){
+            ip_mat_create( a->h, a->w, (a->k + b->k), 0.0 );
+            /* ora vado a riempire le righe e colonne e k di data*/
+                for ( liv=0; liv<x->k; liv++ ) {
+                    for ( rig=0; rig<x->h; rig++ ) {
+                        for ( col=0; col<x->w; col++ ) {
+                            if ( liv < a->k ) {
+                                x->data[liv][rig][col] = a->data[liv][rig][col];
+                            }
+                            else {
+                                x->data[liv][rig][col] = b->data[liv - a->k][rig][col];
+                            }
+                        }
+                    }
+                }
+            }
+      }
+
+      return x;
+  }
+
+/* ###########################
+   Fine funzioni parte 1 TOM
+   ########################### */
+
+
 /*//////////////Yamina & Christian FUNCTIONS//////////////*/
 /***     PARTE 1: OPERAZIONE MATEMATICHE FRA IP_MAT     ***/
 
