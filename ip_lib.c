@@ -176,8 +176,58 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 	return matrix;
 }
 
+/**** PARTE 2: SEMPLICI OPERAZIONI SU IMMAGINI ****/
+/* Converte un'immagine RGB ad una immagine a scala di grigio.
+ * Quest'operazione viene fatta calcolando la media per ogni pixel sui 3 canali
+ * e creando una nuova immagine avente per valore di un pixel su ogni canale la media appena calcolata.
+ * Avremo quindi che tutti i canali saranno uguali.
+ * */
+ip_mat * ip_mat_to_gray_scale(ip_mat * in)
+{
+    /*k è canale(livello), h = righe(rig), w = colonne(col)*/
+    unsigned int liv, rig, col;
+    float totale, media;
+    /*ne creo una nuova con tutti gli elementi a 0*/
+    ip_mat *out = ip_mat_create(in -> h, in -> w, in -> k, 0);
 
+    for(rig = 0; rig < in -> w; rig++)
+    {
+        for(col = 0; col < in -> w; col++)
+        {
+            /*calcolo la media di ogni pixel e la scrivo sui pixel del primo canale*/
+            for(liv = 0; liv < in -> k; liv++)
+            {
+                totale += in -> data[liv][rig][col];
+            }
+            /*finito il ciclo, è stata calcolata la somma dello stesso pixel sui livelli
+            quindi ora non resta che calcolare la media e assegnarla alla cella in cui stiamo "puntando"
+            in questo momento. Così poi passiamo alla successiva e ripetiamo*/
+            media = totale / in -> k;
+            out -> data[0][rig][col] = media;
+        }
+    }
+    /*finito questo, significa che abbiamo iterato per tutto il primo canale, assegnando ad ogni
+    pixel la sua media. Ora bisogna assegnare i corrispettivi valori dei pixel anche ai livelli successivi*/
 
+    for(rig = 0; rig < in -> w; rig++)
+    {
+        for(col = 0; col < in -> w; col++)
+        {
+            /*ai canali successivi al primo (lo 0) assegno i valori presenti nel primo. Ovvero, copio i valori
+            del primo livello nel secondo e nel terzo, cella per cella, scorrendo i canali. Poi passo all'elemento
+            successivo del primo livello (col++) e ripeto*/
+            for(liv = 1; liv < in -> k; liv++)
+            {
+                out -> data[liv][rig][col]= in -> data[0][rig][col];
+            }
+        }
+    }
+    /*per riempire il vettore stats*/
+    compute_stats(out);
+    /*l'immagine fornita in ingresso nella funzione non serve più, quindi può essere liberata*/
+    ip_mat_free(in);
+    return out;
+}
 
 /*///////////////////FUNZIONI FEDERICO////////////////////*/
 
