@@ -221,7 +221,7 @@ ip_mat * ip_mat_copy(ip_mat * in) {
      */
      if ( (row_start <= row_end)  &&  (col_start <= col_end)  &&  (row_start >= 0)  &&  (col_start >= 0)  &&  (row_end <= t->h)  &&  (col_end <= w) ){
 
-         x = ip_mat_create( (row_end - row_start) , (col_end - col_start) ,t->k); /* istanzio la nuova truttura ip_mat con il numero di righe e colonne richieste */
+         x = ip_mat_create( (row_end - row_start) , (col_end - col_start) ,t->k, 1.0); /* istanzio la nuova truttura ip_mat con il numero di righe e colonne richieste */
 
          /* ora vado a riempire le righe e colonne e k di data*/
          for ( liv=0; liv<t->k; liv++ ) {
