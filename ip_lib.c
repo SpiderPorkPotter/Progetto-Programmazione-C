@@ -175,6 +175,10 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 
 	return matrix;
 }
+
+
+
+
 /*///////////////////FUNZIONI FEDERICO////////////////////*/
 
 
@@ -199,7 +203,7 @@ ip_mat * ip_mat_copy(ip_mat * in) {
     }
 
     /* ora assegnamo i valori di stats di in a x */
-    for ( liv=0; liv<k; liv++ ) {
+    for ( liv=0; liv<in->k; liv++ ) {
         x->stat[liv].min = in->stat[liv].min;
         x->stat[liv].max = in->stat[liv].max;
         x->stat[liv].mean = in->stat[liv].mean;
@@ -219,7 +223,7 @@ ip_mat * ip_mat_copy(ip_mat * in) {
         se entrambi gli start sono maggiori o uguali a zero
         se entrambi gli end sono massimo grandi quanto quelli presenti in t
      */
-     if ( (row_start <= row_end)  &&  (col_start <= col_end)  &&  (row_start >= 0)  &&  (col_start >= 0)  &&  (row_end <= t->h)  &&  (col_end <= w) ){
+     if ( (row_start <= row_end)  &&  (col_start <= col_end)  &&  (row_start >= 0)  &&  (col_start >= 0)  &&  (row_end <= t->h)  &&  (col_end <= t->w) ){
 
          x = ip_mat_create( (row_end - row_start) , (col_end - col_start) ,t->k); /* istanzio la nuova truttura ip_mat con il numero di righe e colonne richieste */
 
@@ -243,7 +247,7 @@ ip_mat * ip_mat_copy(ip_mat * in) {
 
 
   ip_mat * ip_mat_concat(ip_mat * a, ip_mat * b, int dimensione) {
-      ip_max *x; /* ho creato il puntatore ad una nuova struttura ip_mat */
+      ip_mat *x; /* ho creato il puntatore ad una nuova struttura ip_mat */
       unsigned int liv, rig, col;
       x = NULL;
 
@@ -322,7 +326,7 @@ ip_mat * ip_mat_copy(ip_mat * in) {
 /*Sum of two ip_mat (all dimensions must be the same)*/
 ip_mat *ip_mat_sum (ip_mat *a, ip_mat *b)
 {
-    int liv, rig, col;
+    unsigned int liv, rig, col;
     ip_mat *out; /*create the ip_mat output*/
 
     out = NULL; /*initialize the new ip_mat*/
@@ -340,7 +344,7 @@ ip_mat *ip_mat_sum (ip_mat *a, ip_mat *b)
 /*Subtraction of two ip_mat (all dimensions must be the same)*/
 ip_mat *ip_mat_sub (ip_mat *a, ip_mat *b)
 {
-    int liv, rig, col;
+    unsigned int liv, rig, col;
     ip_mat *out; /*create the ip_mat output*/
 
     out = NULL; /*initialize the new ip_mat*/
@@ -358,7 +362,7 @@ ip_mat *ip_mat_sub (ip_mat *a, ip_mat *b)
 /*Multiply a scalar to a ip_mat*/
 ip_mat * ip_mat_mul_scalar (ip_mat *a, float c)
 {
-    int liv, rig, col;
+    unsigned int liv, rig, col;
     ip_mat *out; /*create the ip_mat output*/
 
     out = NULL; /*initialize the new ip_mat*/
@@ -374,7 +378,7 @@ ip_mat * ip_mat_mul_scalar (ip_mat *a, float c)
 /*Add a scalar to a ip_mat*/
 ip_mat * ip_mat_add_scalar (ip_mat *a, float c)
 {
-    int liv, rig, col;
+    unsigned int liv, rig, col;
     ip_mat *out; /*create the ip_mat output*/
 
     out = NULL; /*initialize the new ip_mat*/
@@ -391,7 +395,7 @@ ip_mat * ip_mat_add_scalar (ip_mat *a, float c)
 /*    ????? Secondo voi è meglio usare la funzione ip_mat_sum ????	*/
 ip_mat * ip_mat_mean (ip_mat *a, ip_mat *b)
 {
-    int liv, rig, col;
+    unsigned int liv, rig, col;
     ip_mat *out; /*create the ip_mat output*/
 
     out = NULL; /*initialize the new ip_mat*/
