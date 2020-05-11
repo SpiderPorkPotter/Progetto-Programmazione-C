@@ -111,39 +111,36 @@ void ip_mat_free(ip_mat *a)
 
 ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 {
-	unsigned int rig, col, pro; /*indici*/
+	unsigned int liv = 0, rig = 0, col = 0; /*indici*/
 
-	/*variabili per capirsi meglio*/
-	unsigned int righe = h;
-	unsigned int colonne = w;
-	unsigned int spessore = k;
-
-	ip_mat *matrix =(ip_mat*) malloc(sizeof(ip_mat));
+	/*ip_mat *Ipmat =(ip_mat*) malloc(sizeof(ip_mat));*/
+    ip_mat* Ipmat = NULL;
 
 	/*se l'allocazione non va a buon fine*/
-	if(!matrix)
-		return NULL;
+    if((Ipmat = (ip_mat*) malloc(sizeof(ip_mat))))
+    {
+        return NULL;
+    }
 
 	/*perché ne creo una di struttura di tipo ip_mat, al cui interno va tutto*/
 	/*matrix = (ip_mat) malloc(sizeof(ip_mat)*1); */
-	matrix -> w = colonne;
-	matrix -> h = righe;
-	matrix -> k = spessore;
+	Ipmat -> w = w; /*colonne*/
+	Ipmat -> h = h; /*righe*/
+	Ipmat -> k = k; /*livello (o canale)*/
 
-	float ***array;
+	float ***matrix = NULL;
 
-	/*primo "cubetto"*/
-	if((array = (float ***) malloc (sizeof(float ***) * spessore)))
+	if((matrix = (float ***) malloc (sizeof(float **) * k))) /* tolto un *  */
 	{
-		for(pro = 0; pro < spessore; pro++)	/*ciclo per lo spessore*/
+		for(liv = 0; liv < k; liv++)	/*ciclo per lo spessore*/
 		{
 			/*riga completa che parte dalla posizione rig*/
-			if((array[rig] = (float **) malloc(sizeof(float*) * righe)))
+			if((matrix[rig] = (float **) malloc(sizeof(float*) * h)))
 			{
 				/*da ogni posizione rig vengono allocate le colonne*/
-				for(rig = 0; rig < righe; rig++ )
+				for(rig = 0; rig < h; rig++ )
 				{
-					if((array[pro][rig] = (float *) malloc(sizeof(float) * colonne))){
+					if((matrix[liv][rig] = (float *) malloc(sizeof(float) * w))){
 					}
 					else
 						return NULL;
@@ -157,23 +154,23 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 		return NULL;
 
 	/*inizializzazione col parametro v come descritto in ip_lib.h*/
-	for(pro = 0; pro < spessore; pro++)
+	for(liv = 0; liv < k; liv++)
 	{
-		for(rig = 0; rig < righe; rig++)
+		for(rig = 0; rig < h; rig++)
 		{
-			for(col = 0; col < colonne; col++)
+			for(col = 0; col < w; col++)
 			{
-				array[pro][rig][col] = v;
-				/*per stampare il valore v
-				 * printf("pro, rig, col: [%u][%u][%u] = v: %f \n", pro, rig, col, v);*/
+				matrix[liv][rig][col] = v;
+				/*per stampare il valore v*/
+				  printf("pro, rig, col: [%u][%u][%u] = v: %f \n", liv, rig, col, v);
 			}
 		}
 	}
 	/*perché tutta la matrice è contenuta in matrix.data*/
-	matrix -> data = array;
-	matrix -> stat = (stats *) malloc (sizeof(stats) * spessore);
+	Ipmat -> data = matrix;
+	Ipmat -> stat = (stats *) malloc (sizeof(stats) * k);
 
-	return matrix;
+	return Ipmat;
 }
 
 /**** PARTE 2: SEMPLICI OPERAZIONI SU IMMAGINI ****/
@@ -186,7 +183,7 @@ ip_mat * ip_mat_to_gray_scale(ip_mat * in)
 {
     /*k è canale(livello), h = righe(rig), w = colonne(col)*/
     unsigned int liv, rig, col;
-    float totale, media;
+    float totale = 0, media = 0;
     /*ne creo una nuova con tutti gli elementi a 0*/
     ip_mat *out = ip_mat_create(in -> h, in -> w, in -> k, 0);
 
