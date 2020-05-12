@@ -112,12 +112,14 @@ void ip_mat_free(ip_mat *a)
 ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 {
 	unsigned int liv = 0, rig = 0, col = 0; /*indici*/
-
+    float ***matrix; /*madtrice Ipmat->data*/
+    stats* vettore = NULL;
 	/*ip_mat *Ipmat =(ip_mat*) malloc(sizeof(ip_mat));*/
-    ip_mat* Ipmat = NULL;
+    ip_mat* Ipmat;
 
 	/*se l'allocazione non va a buon fine*/
-    if((Ipmat = (ip_mat*) malloc(sizeof(ip_mat))))
+    Ipmat = (ip_mat*) malloc(sizeof(ip_mat*));
+    if(Ipmat == NULL)
     {
         return NULL;
     }
@@ -128,31 +130,34 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 	Ipmat -> h = h; /*righe*/
 	Ipmat -> k = k; /*livello (o canale)*/
 
-	float ***matrix = NULL;
+    matrix = (float***) malloc(k * sizeof(float**));/*axis x, 3 livelli*/
 
-	if((matrix = (float ***) malloc (sizeof(float **) * k))) /* tolto un *  */
-	{
-		for(liv = 0; liv < k; liv++)	/*ciclo per lo spessore*/
-		{
-			/*riga completa che parte dalla posizione rig*/
-			if((matrix[rig] = (float **) malloc(sizeof(float*) * h)))
-			{
-				/*da ogni posizione rig vengono allocate le colonne*/
-				for(rig = 0; rig < h; rig++ )
-				{
-					if((matrix[liv][rig] = (float *) malloc(sizeof(float) * w))){
-					}
-					else
-						return NULL;
-				}
-			}
-			else
-				return NULL;
-		}
-	}
-	else
-		return NULL;
-
+    if(matrix == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        for(liv = 0; liv < k; liv++)/*dal primo livello*/
+        {
+            /**/matrix[liv] = (float**)malloc(h * sizeof(float*));/*h righe*/
+            if(matrix[liv] == NULL)
+            {
+                return NULL;
+            }
+            else
+            {
+                for(rig = 0; rig < h; rig++)
+                {
+                /**/matrix[liv][rig] =(float*) malloc(w * sizeof(float));
+                    if(matrix[liv][rig] == NULL)
+                    {
+                        return NULL;
+                    }
+                }
+            }
+        }
+    }
 	/*inizializzazione col parametro v come descritto in ip_lib.h*/
 	for(liv = 0; liv < k; liv++)
 	{
@@ -162,13 +167,18 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 			{
 				matrix[liv][rig][col] = v;
 				/*per stampare il valore v*/
-				  printf("pro, rig, col: [%u][%u][%u] = v: %f \n", liv, rig, col, v);
 			}
+            printf("pro, rig, col: [%u][%u][%u] = v: %f \n", liv, rig, col, v);
 		}
 	}
 	/*perché tutta la matrice è contenuta in matrix.data*/
 	Ipmat -> data = matrix;
-	Ipmat -> stat = (stats *) malloc (sizeof(stats) * k);
+    vettore = (stats*) malloc(k * sizeof(stats));
+    if(vettore == NULL)
+    {
+        return NULL;
+    }
+	Ipmat -> stat = vettore;
 
 	return Ipmat;
 }

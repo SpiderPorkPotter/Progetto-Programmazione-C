@@ -13,7 +13,15 @@ con valgrind:
     valgrind -v --leak-check=full ./test flower.bmp fullmoon.bmp gray OUT
 normale:
     ./test flower.bmp fullmoon.bmp gray OUT
+con valgring + gdb per il debug
+    valgrind -v --leak-check=full --show-leak-kinds=all --track-origins=yes --vgdb=yes --vgdb-error=0 ./test flower.bmp fullmoon.bmp gray
 
+prima si compila col gcc, poi si da il comando con valgrind. Lui entra in
+pausa. Quindi si deve aprire un'altro terminale e avviare gdb.
+quando è avviato si fa (gdb) target remote | vgdb
+
+Guida all'uso di valgrind con gdb: https://valgrind.org/docs/manual/manual-core-adv.html#manual-core-adv.gdbserver-gdb
+capitolo 3.2.1
 */
 
 ip_mat * ip_mat_corrupt(ip_mat * a, float amount){
