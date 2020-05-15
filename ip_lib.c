@@ -540,7 +540,7 @@ Bitmap * ip_mat_to_bitmap(ip_mat * t){
 
 float get_val(ip_mat * a, unsigned int i,unsigned int j,unsigned int k){
     if(i<a->h && j<a->w &&k<a->k){  /* j>=0 and k>=0 and i>=0 is non sense*/
-        return a->data[i][j][k];
+        return a->data[k][i][j]; /*k è il primo indice*/
     }else{
         printf("Errore get_val!!!");
         exit(1);
@@ -549,7 +549,7 @@ float get_val(ip_mat * a, unsigned int i,unsigned int j,unsigned int k){
 
 void set_val(ip_mat * a, unsigned int i,unsigned int j,unsigned int k, float v){
     if(i<a->h && j<a->w &&k<a->k){
-        a->data[i][j][k]=v;
+        a->data[k][i][j]=v; /*k è il primo indice*/
     }else{
         printf("Errore set_val!!!");
         exit(1);
