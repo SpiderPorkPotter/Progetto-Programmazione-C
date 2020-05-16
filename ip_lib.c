@@ -103,36 +103,37 @@ void ip_mat_free(ip_mat *a)
 	}
 	free(a -> data);
 
+    /*libero il vettore stat*/
+	free(a -> stat);
     /*libero ip_mat (alle 4 malloc create in ip_mat_create corrispondono le 4 free) */
     free(a);
-	/*libero il vettore stat*/
-	free(a -> stat);
+
 }
 
 ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 {
-	unsigned int liv = 0, rig = 0, col = 0; /*indici*/
-    float ***matrix; /*madtrice Ipmat->data*/
-    stats* vettore = NULL;
-	/*ip_mat *Ipmat =(ip_mat*) malloc(sizeof(ip_mat));*/
+    unsigned int liv = 0, rig = 0, col = 0; /*indici*/
+   /* float ***matrix;*/ /*madtrice Ipmat->data*/
+   /* stats* vettore = NULL; */
+    /*ip_mat *Ipmat =(ip_mat*) malloc(sizeof(ip_mat));*/
     ip_mat* Ipmat;
 
-	/*se l'allocazione non va a buon fine*/
-    Ipmat = (ip_mat*) malloc(sizeof(ip_mat*));
+    /*se l'allocazione non va a buon fine*/
+    Ipmat = (ip_mat*) malloc(sizeof(ip_mat));
     if(Ipmat == NULL)
     {
         return NULL;
     }
 
-	/*perché ne creo una di struttura di tipo ip_mat, al cui interno va tutto*/
-	/*matrix = (ip_mat) malloc(sizeof(ip_mat)*1); */
-	Ipmat -> w = w; /*colonne*/
-	Ipmat -> h = h; /*righe*/
-	Ipmat -> k = k; /*livello (o canale)*/
+    /*perché ne creo una di struttura di tipo ip_mat, al cui interno va tutto*/
+    /*matrix = (ip_mat) malloc(sizeof(ip_mat)*1); */
+    Ipmat -> w = w; /*colonne*/
+    Ipmat -> h = h; /*righe*/
+    Ipmat -> k = k; /*livello (o canale)*/
 
-    matrix = (float***) malloc(k * sizeof(float**));/*axis x, 3 livelli*/
+    Ipmat -> data = (float***) malloc(k * sizeof(float**));/*axis x, 3 livelli*/
 
-    if(matrix == NULL)
+    if(Ipmat -> data == NULL)
     {
         return NULL;
     }
@@ -140,8 +141,8 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
     {
         for(liv = 0; liv < k; liv++)/*dal primo livello*/
         {
-            /**/matrix[liv] = (float**)malloc(h * sizeof(float*));/*h righe*/
-            if(matrix[liv] == NULL)
+            /**/Ipmat -> data[liv] = (float**)malloc(h * sizeof(float*));/*h righe*/
+            if(Ipmat -> data[liv] == NULL)
             {
                 return NULL;
             }
@@ -149,8 +150,8 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
             {
                 for(rig = 0; rig < h; rig++)
                 {
-                /**/matrix[liv][rig] =(float*) malloc(w * sizeof(float));
-                    if(matrix[liv][rig] == NULL)
+                /**/Ipmat -> data[liv][rig] =(float*) malloc(w * sizeof(float));
+                    if(Ipmat -> data[liv][rig] == NULL)
                     {
                         return NULL;
                     }
@@ -158,30 +159,30 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
             }
         }
     }
-	/*inizializzazione col parametro v come descritto in ip_lib.h*/
-	for(liv = 0; liv < k; liv++)
-	{
-		for(rig = 0; rig < h; rig++)
-		{
-			for(col = 0; col < w; col++)
-			{
-				matrix[liv][rig][col] = v;
-				/*per stampare il valore v*/
-			}
+    /*inizializzazione col parametro v come descritto in ip_lib.h*/
+    for(liv = 0; liv < k; liv++)
+    {
+        for(rig = 0; rig < h; rig++)
+        {
+            for(col = 0; col < w; col++)
+            {
+                Ipmat -> data[liv][rig][col] = v;
+                /*per stampare il valore v*/
+            }
             printf("pro, rig, col: [%u][%u][%u] = v: %f \n", liv, rig, col, v);
-		}
-	}
-	/*perché tutta la matrice è contenuta in matrix.data*/
-	Ipmat -> data = matrix;
-    vettore = (stats*) malloc(k * sizeof(stats));
-    if(vettore == NULL)
+        }
+    }
+    /*perché tutta la matrice è contenuta in matrix.data*/
+    /*Ipmat -> data = matrix;*/
+    Ipmat -> stat = (stats*) malloc(k * sizeof(stats));
+    if(Ipmat -> stat == NULL)
     {
         return NULL;
     }
-	Ipmat -> stat = vettore;
 
-	return Ipmat;
+    return Ipmat;
 }
+
 
 /**** PARTE 2: SEMPLICI OPERAZIONI SU IMMAGINI ****/
 /* Converte un'immagine RGB ad una immagine a scala di grigio.
