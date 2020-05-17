@@ -92,19 +92,21 @@ void ip_mat_free(ip_mat *a)
 	/*liberare data (la matrice), stat (il vettore), e poi tutta la struttura*/
 	unsigned int i,j;
 
+    /*libero il vettore stat*/
+	free(a -> stat);
 	/*la deallocazione parte dall'interno*/
 	for (i = 0; i < a -> k; i++)
 	{
-		for (j = 0; j < a -> h; j++)
+		for (j = 0; j < a -> w; j++)
 		{
+            printf("elimino liv, rig, col: [%u][%u][%u] = v: %f \n", i, j, 0,a->data[i][j][0]);
 			free(a -> data[i][j]);
 		}
 		free(a -> data[i]);
 	}
 	free(a -> data);
 
-    /*libero il vettore stat*/
-	free(a -> stat);
+
     /*libero ip_mat (alle 4 malloc create in ip_mat_create corrispondono le 4 free) */
     free(a);
 
@@ -198,11 +200,12 @@ ip_mat * ip_mat_to_gray_scale(ip_mat * in)
     /*ne creo una nuova con tutti gli elementi a 0*/
     ip_mat *out = ip_mat_create(in -> h, in -> w, in -> k, 0);
 
-    for(rig = 0; rig < in -> w; rig++)
+    for(rig = 0; rig < in -> h; rig++)
     {
         for(col = 0; col < in -> w; col++)
         {
             /*calcolo la media di ogni pixel e la scrivo sui pixel del primo canale*/
+            totale = 0;
             for(liv = 0; liv < in -> k; liv++)
             {
                 totale += in -> data[liv][rig][col];
@@ -217,7 +220,7 @@ ip_mat * ip_mat_to_gray_scale(ip_mat * in)
     /*finito questo, significa che abbiamo iterato per tutto il primo canale, assegnando ad ogni
     pixel la sua media. Ora bisogna assegnare i corrispettivi valori dei pixel anche ai livelli successivi*/
 
-    for(rig = 0; rig < in -> w; rig++)
+    for(rig = 0; rig < in -> h; rig++)
     {
         for(col = 0; col < in -> w; col++)
         {
@@ -226,7 +229,7 @@ ip_mat * ip_mat_to_gray_scale(ip_mat * in)
             successivo del primo livello (col++) e ripeto*/
             for(liv = 1; liv < in -> k; liv++)
             {
-                out -> data[liv][rig][col]= in -> data[0][rig][col];
+                out -> data[liv][rig][col]= out -> data[0][rig][col];
             }
         }
     }
