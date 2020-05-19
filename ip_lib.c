@@ -566,3 +566,33 @@ float get_normal_random(){
     return cos(2*PI*y2)*sqrt(-2.*log(y1));
 
 }
+
+/*  FUNZIONI PARTE 2 TOM
+    Funzione sulla "fusione" di due immagini fatta in base alla variabile alpha */
+ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha) {
+    ip_mat *x;
+    unsigned int liv, rig, col;
+    x = NULL;
+
+    /*control if all dimensions are equal
+    Credete sia necessario anche verificare se i canali sono 3? */
+    if(a->h == b->h && a->w == b->w && a->k == b->k) {
+        /* ho richiamato la funzione create per assegnare le tre dimensioni ed allocare stats e data */
+        x = ip_mat_create(in->h, in->w, in->k, 1.0);
+
+        /* ora assegnamo i valori di data di in a x */
+        for ( liv=0; liv<x->k; liv++ ) {
+            for ( rig=0; rig<x->h; rig++ ) {
+                for ( col=0; col<x->w; col++ ) {
+                    x->data[liv][rig][col] = (unsigned int) (alpha * (a->data[liv][rig][col]) + (1-alpha) * (b->data[liv][rig][col]));
+                }
+            }
+        }
+
+        /* calcolo le statistiche su x */
+        compute_stats(x);
+    }
+
+    /* la funzione restituisce NULL se le dimensioni di a e b non sono uguali */
+    return x;
+}
