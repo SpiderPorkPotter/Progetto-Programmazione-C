@@ -12,7 +12,7 @@
  {
 	 /*k è canale(livello), h = righe(rig), w = colonne(col)*/
 	 unsigned int liv, rig, col;
-     float valore, risNormRand;
+     float risNormRand;
 
      for(liv = 0; liv < t -> k; liv++)
      {
@@ -21,14 +21,13 @@
              for(col = 0; col < t -> w; col++)
              {
                  /*ottengo il valore*/
-                 risNormRand = get_normal_random();
-                 valore = mean + (var * risNormRand);
-                 t -> data[liv][rig][col] = valore ;
-                 /*per stampare il valore v
-                  * printf("pro, rig, col: [%u][%u][%u] = v: %f \n", pro, rig, col, v);*/
+                 risNormRand = get_normal_random(mean, var);
+
+                 t -> data[liv][rig][col] = risNormRand ;
              }
          }
      }
+     compute_stats(t);
  }
 
 void compute_stats(ip_mat * t)
@@ -89,7 +88,7 @@ void compute_stats(ip_mat * t)
 
 void ip_mat_free(ip_mat *a)
 {
-	/*liberare data (la matrice), stat (il vettore), e poi tutta la struttura*/
+	/*liberare data (la matrice), stat (il vettore), e tutta la struttura*/
 	unsigned int i,j;
 
     /*libero il vettore stat*/
@@ -97,11 +96,13 @@ void ip_mat_free(ip_mat *a)
 	/*la deallocazione parte dall'interno*/
 	for (i = 0; i < a -> k; i++)
 	{
+        printf("J: %u\n",j );
 		for (j = 0; j < a -> w; j++)
 		{
-            printf("elimino liv, rig, col: [%u][%u][%u] = v: %f \n", i, j, 0,a->data[i][j][0]);
+            printf("elimino liv,rig, col: [%u][%u][%u] = v: %f \n", i, j, 0,a->data[i][j][0]);
 			free(a -> data[i][j]);
-		}
+            printf("ELIMINATO liv,rig, col: [%u][%u][%u] = v: %f \n", i, j, 0,a->data[0][i][j]);
+        }
 		free(a -> data[i]);
 	}
 	free(a -> data);
@@ -171,7 +172,6 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
                 Ipmat -> data[liv][rig][col] = v;
                 /*per stampare il valore v*/
             }
-            printf("pro, rig, col: [%u][%u][%u] = v: %f \n", liv, rig, col, v);
         }
     }
     /*perché tutta la matrice è contenuta in matrix.data*/
@@ -184,7 +184,6 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 
     return Ipmat;
 }
-
 
 /**** PARTE 2: SEMPLICI OPERAZIONI SU IMMAGINI ****/
 /* Converte un'immagine RGB ad una immagine a scala di grigio.
@@ -276,7 +275,7 @@ ip_mat * ip_mat_copy(ip_mat * in) {
 
  ip_mat * ip_mat_subset(ip_mat * t, unsigned int row_start, unsigned int row_end, unsigned int col_start, unsigned int col_end) {
      ip_mat *x;  /* ho creato il puntatore ad una nuova struttura ip_mat */
-     unsigned int liv, rig, col;
+     unsigned int liv, rig, col, zero=0;
      x = NULL;
 
      /* controlla se:
@@ -284,7 +283,7 @@ ip_mat * ip_mat_copy(ip_mat * in) {
         se entrambi gli start sono maggiori o uguali a zero
         se entrambi gli end sono massimo grandi quanto quelli presenti in t
      */
-     if ( (row_start <= row_end)  &&  (col_start <= col_end)  &&  (row_start >= 0)  &&  (col_start >= 0)  &&  (row_end <= t->h)  &&  (col_end <= t->w) ){
+     if ( (row_start <= row_end)  &&  (col_start <= col_end)  &&  (row_start >= zero)  &&  (col_start >= zero)  &&  (row_end <= t->h)  &&  (col_end <= t->w) ){
 
          x = ip_mat_create( (row_end - row_start) , (col_end - col_start) ,t->k, 1.0); /* istanzio la nuova truttura ip_mat con il numero di righe e colonne richieste */
 
@@ -522,6 +521,8 @@ ip_mat * bitmap_to_ip_mat(Bitmap * img){
         }
     }
 
+    compute_stats(out);
+
     return out;
 }
 
@@ -543,8 +544,8 @@ Bitmap * ip_mat_to_bitmap(ip_mat * t){
 }
 
 float get_val(ip_mat * a, unsigned int i,unsigned int j,unsigned int k){
-    if(i<a->h && j<a->w &&k<a->k){  /* j>=0 and k>=0 and i>=0 is non sense*/
-        return a->data[k][i][j]; /*k è il primo indice*/
+    if(i<a->h && j<a->w &&k<a->k){
+        return a->data[k][i][j];
     }else{
         printf("Errore get_val!!!");
         exit(1);
@@ -553,46 +554,18 @@ float get_val(ip_mat * a, unsigned int i,unsigned int j,unsigned int k){
 
 void set_val(ip_mat * a, unsigned int i,unsigned int j,unsigned int k, float v){
     if(i<a->h && j<a->w &&k<a->k){
-        a->data[k][i][j]=v; /*k è il primo indice*/
+        a->data[k][i][j]=v; /*k è il livello*/
     }else{
         printf("Errore set_val!!!");
         exit(1);
     }
 }
 
-float get_normal_random(){
+float get_normal_random(float media, float std){
+
     float y1 = ( (float)(rand()) + 1. )/( (float)(RAND_MAX) + 1. );
     float y2 = ( (float)(rand()) + 1. )/( (float)(RAND_MAX) + 1. );
-    return cos(2*PI*y2)*sqrt(-2.*log(y1));
+    float num = cos(2*PI*y2)*sqrt(-2.*log(y1));
 
-}
-
-/*  FUNZIONI PARTE 2 TOM
-    Funzione sulla "fusione" di due immagini fatta in base alla variabile alpha */
-ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha) {
-    ip_mat *x;
-    unsigned int liv, rig, col;
-    x = NULL;
-
-    /*control if all dimensions are equal
-    Credete sia necessario anche verificare se i canali sono 3? */
-    if(a->h == b->h && a->w == b->w && a->k == b->k) {
-        /* ho richiamato la funzione create per assegnare le tre dimensioni ed allocare stats e data */
-        x = ip_mat_create(in->h, in->w, in->k, 1.0);
-
-        /* ora assegnamo i valori di data di in a x */
-        for ( liv=0; liv<x->k; liv++ ) {
-            for ( rig=0; rig<x->h; rig++ ) {
-                for ( col=0; col<x->w; col++ ) {
-                    x->data[liv][rig][col] = (unsigned int) (alpha * (a->data[liv][rig][col]) + (1-alpha) * (b->data[liv][rig][col]));
-                }
-            }
-        }
-
-        /* calcolo le statistiche su x */
-        compute_stats(x);
-    }
-
-    /* la funzione restituisce NULL se le dimensioni di a e b non sono uguali */
-    return x;
+    return media + num*std;
 }

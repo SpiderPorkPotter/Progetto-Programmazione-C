@@ -6,7 +6,8 @@
 
 /*per compilazione iniziale:
     gcc Main_Testa_funzioni.c ip_lib.c bmp.c -lm -g -Wall -O1 -o test
-
+    ulteriori flag con cui verrà compilato il progetto:
+    -Wall --ansi --pedantic -lm -g3 -O3 -fsanitize=address -fsanitize=undefined -std=gnu89 -Wextra
 
 per esecuzione:
 con valgrind:
