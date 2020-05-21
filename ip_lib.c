@@ -22,7 +22,6 @@
              {
                  /*ottengo il valore*/
                  risNormRand = get_normal_random(mean, var);
-
                  t -> data[liv][rig][col] = risNormRand ;
              }
          }
@@ -89,33 +88,29 @@ void compute_stats(ip_mat * t)
 void ip_mat_free(ip_mat *a)
 {
 	/*liberare data (la matrice), stat (il vettore), e tutta la struttura*/
-	unsigned int i,j;
-
-    /*libero il vettore stat*/
+	unsigned int liv,rig;
+    if(a == NULL)
+        return;
+    /*libera stat*/
 	free(a -> stat);
-	/*la deallocazione parte dall'interno*/
-	for (i = 0; i < a -> k; i++)
+    /*elimina prima per ogni cella delle righe, la colonna.
+    Terminato il ciclo interno elimina tutte le righe e quindi la matrice.
+    Passa al livello (canale) successivo e ripete*/
+	for (liv = 0; liv < a -> k; liv++)
 	{
-        printf("J: %u\n",j );
-		for (j = 0; j < a -> w; j++)
+		for (rig = 0; rig < a -> h; rig++)
 		{
-            printf("elimino liv,rig, col: [%u][%u][%u] = v: %f \n", i, j, 0,a->data[i][j][0]);
-			free(a -> data[i][j]);
-            printf("ELIMINATO liv,rig, col: [%u][%u][%u] = v: %f \n", i, j, 0,a->data[0][i][j]);
+			free(a -> data[liv][rig]);
         }
-		free(a -> data[i]);
+		free(a -> data[liv]);
 	}
 	free(a -> data);
-
-
-    /*libero ip_mat (alle 4 malloc create in ip_mat_create corrispondono le 4 free) */
     free(a);
-
 }
 
 ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 {
-    unsigned int liv = 0, rig = 0, col = 0; /*indici*/
+    unsigned int liv, rig, col; /*indici*/
    /* float ***matrix;*/ /*madtrice Ipmat->data*/
    /* stats* vettore = NULL; */
     /*ip_mat *Ipmat =(ip_mat*) malloc(sizeof(ip_mat));*/
@@ -134,34 +129,28 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
     Ipmat -> h = h; /*righe*/
     Ipmat -> k = k; /*livello (o canale)*/
 
-    Ipmat -> data = (float***) malloc(k * sizeof(float**));/*axis x, 3 livelli*/
-
-    if(Ipmat -> data == NULL)
+    /*se l'allocazione dei tre livelli (canali) va a buon fine*/
+    if( ( Ipmat -> data = (float***) malloc(k * sizeof(float**)) ) )
     {
-        return NULL;
-    }
-    else
-    {
-        for(liv = 0; liv < k; liv++)/*dal primo livello*/
+        for(liv = 0; liv < k; liv++ ) /*per ogni livello*/
         {
-            /**/Ipmat -> data[liv] = (float**)malloc(h * sizeof(float*));/*h righe*/
-            if(Ipmat -> data[liv] == NULL)
+            if( ( Ipmat -> data[liv] = (float**) malloc(h * sizeof(float*)) ) ) /*alloca h righe (puntatori)*/
             {
-                return NULL;
-            }
-            else
-            {
-                for(rig = 0; rig < h; rig++)
+                for(rig = 0; rig < h; rig++)    /*per ogni puntatore*/
                 {
-                /**/Ipmat -> data[liv][rig] =(float*) malloc(w * sizeof(float));
-                    if(Ipmat -> data[liv][rig] == NULL)
+                    if( ! ( Ipmat -> data[liv][rig] = (float*) malloc(w * sizeof(float)) ) )/*alloca una colonna composta da float*/
                     {
                         return NULL;
                     }
                 }
             }
+            else
+                return NULL;
         }
     }
+    else
+        return NULL;
+
     /*inizializzazione col parametro v come descritto in ip_lib.h*/
     for(liv = 0; liv < k; liv++)
     {
@@ -172,8 +161,11 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
                 Ipmat -> data[liv][rig][col] = v;
                 /*per stampare il valore v*/
             }
+            printf("col: %u\n\n", col );
         }
+        printf("rig: %u\n\n", rig );
     }
+    printf("liv: %u\n\n", liv );
     /*perché tutta la matrice è contenuta in matrix.data*/
     /*Ipmat -> data = matrix;*/
     Ipmat -> stat = (stats*) malloc(k * sizeof(stats));
@@ -554,7 +546,7 @@ float get_val(ip_mat * a, unsigned int i,unsigned int j,unsigned int k){
 
 void set_val(ip_mat * a, unsigned int i,unsigned int j,unsigned int k, float v){
     if(i<a->h && j<a->w &&k<a->k){
-        a->data[k][i][j]=v; /*k è il livello*/
+        a->data[k][i][j]=v;
     }else{
         printf("Errore set_val!!!");
         exit(1);

@@ -59,11 +59,11 @@ ip_mat * create_emboss_filter(){
     return NULL;
 }
 
-ip_mat * create_average_filter(int w, int h, int k){
+ip_mat * create_average_filter(unsigned int h, unsigned int w, unsigned int k){
     return NULL;
 }
 
-ip_mat * create_gaussian_filter(int w, int h, int k, float sigma){
+ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, float sigma){
     return NULL;
 }
 
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
         img = temp;
     }
 
-    ip_mat_free(input_img); /* libera la memoria dalla ip_mat contenente l'immagine di input */
+    /*ip_mat_free(input_img); *//* libera la memoria dalla ip_mat contenente l'immagine di input */
 
     b2 = ip_mat_to_bitmap(img); /* converti l'immagine di output in una bitmap */
 
