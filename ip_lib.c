@@ -561,3 +561,67 @@ float get_normal_random(float media, float std){
 
     return media + num*std;
 }
+
+/* IP_MAT_CORRUPT
+   Autori: Fatta da tutti assieme in videochiamata 
+*/
+ip_mat * ip_mat_corrupt(ip_mat * in, float amount) {
+    ip_mat *x;  /* ho creato il puntatore ad una nuova struttura ip_mat */
+    unsigned int liv, rig, col;
+    /* ho richiamato la funzione copy per copiare la ip_mat in entrata */
+    x = ip_mat_copy(in);
+
+    /* ora assegnamo i valori di data di in a x */
+    for ( liv=0; liv<in->k; liv++ ) {
+        for ( rig=0; rig<in->h; rig++ ) {
+            for ( col=0; col<in->w; col++ ) {
+                x->data[liv][rig][col] = (x->data[liv][rig][col])+(get_normal_random(amount,x->stat[liv].mean)*amount);
+            }
+        }
+    }
+
+    return x;
+}
+
+
+/* ### PARTE 3 ### */
+
+/* IP_MAT_PADDING
+   Autore: Tom
+   Descrizione: Funzione per aggiungere un padding ad una ip_mat passata.
+		Non lavora direttamente sulla ip_mat passata in input ma ne genera una copia (x) su cui viene elaborato il tutto.
+*/
+ip_mat * ip_mat_padding(ip_mat * a, unsigned int pad_h, unsigned int pad_w) {
+    ip_mat *x; /* ip_mat dove copierò a e dove eseguirò tutte le operazioni */
+    unsigned int liv, rig, col;
+    x = ip_mat_copy(a);
+
+    for ( liv=0; liv<x->k; liv++ ) {
+        /* sezione superiore */
+        for ( rig=0; rig<pad_h; rig++ ) {
+            for ( col=0; col<x->w; col++ ) {
+                x->data[liv][rig][col] = 0.0;
+            }
+        }
+        /* sezioni laterali - parte sx */
+        for ( rig=pad_h; rig<((x->h)-pad_h); rig++ ) {
+            for ( col=0; col<((x->w)-pad_w); col++ ) {
+                x->data[liv][rig][col] = 0.0;
+            }
+        }
+        /* sezioni laterali - parte dx */
+        for ( rig=pad_h; rig<((x->h)-pad_h); rig++ ) {
+            for ( col=((x->w)-pad_w); col<x->w; col++ ) {
+                x->data[liv][rig][col] = 0.0;
+            }
+        }
+        /* sezione inferiori */
+        for ( rig=()(x->h)-pad_h); rig<x->h; rig++ ) {
+            for ( col=0; col<x->w; col++ ) {
+                x->data[liv][rig][col] = 0.0;
+            }
+        }
+    }
+
+    return x;
+}
