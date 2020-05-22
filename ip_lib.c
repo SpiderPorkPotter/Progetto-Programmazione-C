@@ -562,8 +562,9 @@ float get_normal_random(float media, float std){
     return media + num*std;
 }
 
-/* IP_MAT_CORRUPT
-   Autori: Fatta da tutti assieme in videochiamata 
+/* 
+	IP_MAT_CORRUPT
+	Autori: Fatta da tutti assieme in videochiamata 
 */
 ip_mat * ip_mat_corrupt(ip_mat * in, float amount) {
     ip_mat *x;  /* ho creato il puntatore ad una nuova struttura ip_mat */
@@ -584,12 +585,51 @@ ip_mat * ip_mat_corrupt(ip_mat * in, float amount) {
 }
 
 
-/* ### PARTE 3 ### */
+/*  
+IP_MAT_BLEND
+Autore: Tom
+Descrizione: Unisce due immagini assieme, queste devono essere della stessa dimensione (anche i canali).
+	     La funzione non modifica i parametri in ingresso ma crea una nuova ip_mat su cui scrive i risultati delle computazioni.
+*/
+ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha) {
+    ip_mat *x;
+    unsigned int liv, rig, col;
+    x = NULL;
 
-/* IP_MAT_PADDING
-   Autore: Tom
-   Descrizione: Funzione per aggiungere un padding ad una ip_mat passata.
-		Non lavora direttamente sulla ip_mat passata in input ma ne genera una copia (x) su cui viene elaborato il tutto.
+    /*control if all dimensions are equal
+    Credete sia necessario anche verificare se i canali sono 3? */
+    if(a->h == b->h && a->w == b->w && a->k == b->k) {
+        /* ho richiamato la funzione create per assegnare le tre dimensioni ed allocare stats e data */
+        x = ip_mat_create(in->h, in->w, in->k, 1.0);
+
+        /* ora assegnamo i valori di data di in a x */
+        for ( liv=0; liv<x->k; liv++ ) {
+            for ( rig=0; rig<x->h; rig++ ) {
+                for ( col=0; col<x->w; col++ ) {
+                    x->data[liv][rig][col] = (unsigned int) (alpha * (a->data[liv][rig][col]) + (1-alpha) * (b->data[liv][rig][col]));
+                }
+            }
+        }
+
+        /* calcolo le statistiche su x */
+        compute_stats(x);
+    }
+
+    /* la funzione restituisce NULL se le dimensioni di a e b non sono uguali */
+    return x;
+}
+
+
+
+/* ############### 
+   ### PARTE 3 ### 
+   ############### */
+
+/* 
+IP_MAT_PADDING
+Autore: Tom
+Descrizione: Funzione per aggiungere un padding ad una ip_mat passata.
+	     Non lavora direttamente sulla ip_mat passata in input ma ne genera una copia (x) su cui viene elaborato il tutto.
 */
 ip_mat * ip_mat_padding(ip_mat * a, unsigned int pad_h, unsigned int pad_w) {
     ip_mat *x; /* ip_mat dove copierò a e dove eseguirò tutte le operazioni */
