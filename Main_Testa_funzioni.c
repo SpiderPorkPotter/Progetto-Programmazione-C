@@ -10,8 +10,10 @@
     -Wall --ansi --pedantic -lm -g3 -O3 -fsanitize=address -fsanitize=undefined -std=gnu89 -Wextra
 
 per esecuzione:
+
 con valgrind:
     valgrind -v --leak-check=full ./test flower.bmp fullmoon.bmp gray OUT
+
 normale:
     ./test flower.bmp fullmoon.bmp gray OUT
 con valgring + gdb per il debug
@@ -21,14 +23,10 @@ prima si compila col gcc, poi si da il comando con valgrind. Lui entra in
 pausa. Quindi si deve aprire un'altro terminale e avviare gdb.
 quando è avviato si fa (gdb) target remote | vgdb
 
-Guida all'uso di valgrind con gdb: https://valgrind.org/docs/manual/manual-core-adv.html#manual-core-adv.gdbserver-gdb
+Guida all'uso di valgrind con gdb: https://valgrind.org/doc==2601== Use --track-origins=yes to see where uninitialised vas/manual/manual-core-adv.html#manual-core-adv.gdbserver-gdb
 capitolo 3.2.1
 */
 
-
-ip_mat * ip_mat_brighten(ip_mat * a, float bright){
-    return NULL;
-}
 
 void clamp(ip_mat * t, float low, float high)
 {

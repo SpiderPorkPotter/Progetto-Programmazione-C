@@ -364,12 +364,27 @@ ip_mat * ip_mat_mul_scalar (ip_mat *a, float c)
 ip_mat * ip_mat_add_scalar (ip_mat *a, float c)
 {
     unsigned int liv, rig, col;
-   ip_mat *out = ip_mat_create(a->h, a->w, a->k, 0);  /*create the ip_mat output*/
-	
+    ip_mat *out = ip_mat_create(a->h, a->w, a->k, 0);  /*create the ip_mat output*/
+
     for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
+    {
         for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
+        {
             for(col = 0; col < a->w; col++) /*cycle to scroll the width*/
-                out->data[liv][rig][col] = a->data[liv][rig][col] + c;
+            {
+                if( (a->data[liv][rig][col] + c) > 255 )
+                {
+                    out->data[liv][rig][col] = 255;
+                }
+                else if( (a->data[liv][rig][col] + c) < 0 )
+                {
+                    out->data[liv][rig][col] = 0;
+                }
+                else
+                    out->data[liv][rig][col] = a->data[liv][rig][col] + c;
+            }
+        }
+    }
 
     return out;
 }
@@ -490,14 +505,14 @@ ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha) {
 /* IP_MAT_BRIGHTEN
 Autore: Yamina
 Descrizione: aumenta la luminosità dell'immagine, aggiunge ad ogni pixel un certo valore.
-	     I parametri della funzione non subiscono modiche, il risultato viene salvato e restituito in output 
+	     I parametri della funzione non subiscono modiche, il risultato viene salvato e restituito in output
 	     all'interno di una nuova ip_mat.
 */
 ip_mat * ip_mat_brighten(ip_mat * a, float bright)
 {
     ip_mat *out = ip_mat_create(a->h, a->w, a->k, 0); /*create the ip_mat output*/
 
-    out = ip_mat_add_scalar(a, bright); /*Use of the mathematical scalar addition function to add a certain value to each pixel*/
+    out = ip_mat_add_scalar(a, 100.0); /*Use of the mathematical scalar addition function to add a certain value to each pixel*/
 
     return out;
 }
@@ -509,6 +524,8 @@ ip_mat * ip_mat_brighten(ip_mat * a, float bright)
 ip_mat * ip_mat_corrupt(ip_mat * in, float amount) {
     ip_mat *x;  /* ho creato il puntatore ad una nuova struttura ip_mat */
     unsigned int liv, rig, col;
+    float ris;
+    amount = 255;
     /* ho richiamato la funzione copy per copiare la ip_mat in entrata */
     x = ip_mat_copy(in);
 
@@ -516,7 +533,17 @@ ip_mat * ip_mat_corrupt(ip_mat * in, float amount) {
     for ( liv=0; liv<in->k; liv++ ) {
         for ( rig=0; rig<in->h; rig++ ) {
             for ( col=0; col<in->w; col++ ) {
-                x->data[liv][rig][col] = (x->data[liv][rig][col])+(get_normal_random(amount,x->stat[liv].mean)*amount);
+                ris = (x->data[liv][rig][col])+(get_normal_random(-(x->stat[liv].mean),x->stat[liv].mean));
+            /*    if( ris  > 255 )
+                {
+                    x->data[liv][rig][col] = 255;
+                }
+                else if( ris < 0 )
+                {
+                    x->data[liv][rig][col] = 0;
+                }
+                else*/
+                    x->data[liv][rig][col] = ris;
             }
         }
     }

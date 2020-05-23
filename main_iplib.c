@@ -3,6 +3,21 @@
 #include "ip_lib.h"
 #include "bmp.h"
 
+void clamp(ip_mat * t, float low, float high)
+{
+    int cane = 1;
+    cane++;
+}
+
+ip_mat * ip_mat_convolve(ip_mat * a, ip_mat * f){
+    return NULL;
+}
+/* Crea un filtro gaussiano per la rimozione del rumore */
+ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, float sigma)
+{
+    return NULL;
+}
+
 void show_help(){
     printf("*** Image Processing Toolbox ***\n");
     printf("\targ 1: input file name (img1) \n");
