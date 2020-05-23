@@ -318,9 +318,7 @@ ip_mat * ip_mat_copy(ip_mat * in) {
 ip_mat *ip_mat_sum (ip_mat *a, ip_mat *b)
 {
     unsigned int liv, rig, col;
-    ip_mat *out; /*create the ip_mat output*/
-
-    out = NULL; /*initialize the new ip_mat*/
+    ip_mat *out = ip_mat_create(a->h, a->w, a->k, 0);  /*create the ip_mat output*/
 
     if(a->h == b->h && a->w == b->w && a->k == b->k) /*control if all dimensions are equal*/
     {
@@ -336,9 +334,7 @@ ip_mat *ip_mat_sum (ip_mat *a, ip_mat *b)
 ip_mat *ip_mat_sub (ip_mat *a, ip_mat *b)
 {
     unsigned int liv, rig, col;
-    ip_mat *out; /*create the ip_mat output*/
-
-    out = NULL; /*initialize the new ip_mat*/
+    ip_mat *out = ip_mat_create(a->h, a->w, a->k, 0);  /*create the ip_mat output*/
 
     if(a->h == b->h && a->w == b->w && a->k == b->k) /*control if all dimensions are equal*/
     {
@@ -354,9 +350,7 @@ ip_mat *ip_mat_sub (ip_mat *a, ip_mat *b)
 ip_mat * ip_mat_mul_scalar (ip_mat *a, float c)
 {
     unsigned int liv, rig, col;
-    ip_mat *out; /*create the ip_mat output*/
-
-    out = NULL; /*initialize the new ip_mat*/
+    ip_mat *out = ip_mat_create(a->h, a->w, a->k, 0);  /*create the ip_mat output*/
 
     for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
         for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
@@ -370,10 +364,8 @@ ip_mat * ip_mat_mul_scalar (ip_mat *a, float c)
 ip_mat * ip_mat_add_scalar (ip_mat *a, float c)
 {
     unsigned int liv, rig, col;
-    ip_mat *out; /*create the ip_mat output*/
-
-    out = NULL; /*initialize the new ip_mat*/
-
+   ip_mat *out = ip_mat_create(a->h, a->w, a->k, 0);  /*create the ip_mat output*/
+	
     for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
         for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
             for(col = 0; col < a->w; col++) /*cycle to scroll the width*/
@@ -387,9 +379,7 @@ ip_mat * ip_mat_add_scalar (ip_mat *a, float c)
 ip_mat * ip_mat_mean (ip_mat *a, ip_mat *b)
 {
     unsigned int liv, rig, col;
-    ip_mat *out; /*create the ip_mat output*/
-
-    out = NULL; /*initialize the new ip_mat*/
+    ip_mat *out = ip_mat_create(a->h, a->w, a->k, 0); /*create the ip_mat output*/
 
     if(a->h == b->h && a->w == b->w && a->k == b->k) /*control if all dimensions are equal*/
     {
@@ -495,6 +485,21 @@ ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha) {
 
     /* la funzione restituisce NULL se le dimensioni di a e b non sono uguali */
     return x;
+}
+
+/* IP_MAT_BRIGHTEN
+Autore: Yamina
+Descrizione: aumenta la luminosità dell'immagine, aggiunge ad ogni pixel un certo valore.
+	     I parametri della funzione non subiscono modiche, il risultato viene salvato e restituito in output 
+	     all'interno di una nuova ip_mat.
+*/
+ip_mat * ip_mat_brighten(ip_mat * a, float bright)
+{
+    ip_mat *out = ip_mat_create(a->h, a->w, a->k, 0); /*create the ip_mat output*/
+
+    out = ip_mat_add_scalar(a, bright); /*Use of the mathematical scalar addition function to add a certain value to each pixel*/
+
+    return out;
 }
 
 /*
