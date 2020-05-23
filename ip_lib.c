@@ -6,7 +6,7 @@
 #include "ip_lib.h"
 #include "bmp.h"
 
-/*///////////////////FUNZIONI FEDERICO////////////////////*/
+/*///////////////////FUNZIONI FEDERICO PARTE 1////////////////////*/
 
  void ip_mat_init_random(ip_mat * t, float mean, float var)
  {
@@ -111,9 +111,7 @@ void ip_mat_free(ip_mat *a)
 ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
 {
     unsigned int liv, rig, col; /*indici*/
-   /* float ***matrix;*/ /*madtrice Ipmat->data*/
-   /* stats* vettore = NULL; */
-    /*ip_mat *Ipmat =(ip_mat*) malloc(sizeof(ip_mat));*/
+
     ip_mat* Ipmat;
 
     /*se l'allocazione non va a buon fine*/
@@ -124,7 +122,6 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
     }
 
     /*perché ne creo una di struttura di tipo ip_mat, al cui interno va tutto*/
-    /*matrix = (ip_mat) malloc(sizeof(ip_mat)*1); */
     Ipmat -> w = w; /*colonne*/
     Ipmat -> h = h; /*righe*/
     Ipmat -> k = k; /*livello (o canale)*/
@@ -159,13 +156,9 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
             for(col = 0; col < w; col++)
             {
                 Ipmat -> data[liv][rig][col] = v;
-                /*per stampare il valore v*/
             }
-            printf("col: %u\n\n", col );
         }
-        printf("rig: %u\n\n", rig );
     }
-    printf("liv: %u\n\n", liv );
     /*perché tutta la matrice è contenuta in matrix.data*/
     /*Ipmat -> data = matrix;*/
     Ipmat -> stat = (stats*) malloc(k * sizeof(stats));
@@ -177,61 +170,7 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
     return Ipmat;
 }
 
-/**** PARTE 2: SEMPLICI OPERAZIONI SU IMMAGINI ****/
-/* Converte un'immagine RGB ad una immagine a scala di grigio.
- * Quest'operazione viene fatta calcolando la media per ogni pixel sui 3 canali
- * e creando una nuova immagine avente per valore di un pixel su ogni canale la media appena calcolata.
- * Avremo quindi che tutti i canali saranno uguali.
- * */
-ip_mat * ip_mat_to_gray_scale(ip_mat * in)
-{
-    /*k è canale(livello), h = righe(rig), w = colonne(col)*/
-    unsigned int liv, rig, col;
-    float totale = 0, media = 0;
-    /*ne creo una nuova con tutti gli elementi a 0*/
-    ip_mat *out = ip_mat_create(in -> h, in -> w, in -> k, 0);
-
-    for(rig = 0; rig < in -> h; rig++)
-    {
-        for(col = 0; col < in -> w; col++)
-        {
-            /*calcolo la media di ogni pixel e la scrivo sui pixel del primo canale*/
-            totale = 0;
-            for(liv = 0; liv < in -> k; liv++)
-            {
-                totale += in -> data[liv][rig][col];
-            }
-            /*finito il ciclo, è stata calcolata la somma dello stesso pixel sui livelli
-            quindi ora non resta che calcolare la media e assegnarla alla cella in cui stiamo "puntando"
-            in questo momento. Così poi passiamo alla successiva e ripetiamo*/
-            media = totale / in -> k;
-            out -> data[0][rig][col] = media;
-        }
-    }
-    /*finito questo, significa che abbiamo iterato per tutto il primo canale, assegnando ad ogni
-    pixel la sua media. Ora bisogna assegnare i corrispettivi valori dei pixel anche ai livelli successivi*/
-
-    for(rig = 0; rig < in -> h; rig++)
-    {
-        for(col = 0; col < in -> w; col++)
-        {
-            /*ai canali successivi al primo (lo 0) assegno i valori presenti nel primo. Ovvero, copio i valori
-            del primo livello nel secondo e nel terzo, cella per cella, scorrendo i canali. Poi passo all'elemento
-            successivo del primo livello (col++) e ripeto*/
-            for(liv = 1; liv < in -> k; liv++)
-            {
-                out -> data[liv][rig][col]= out -> data[0][rig][col];
-            }
-        }
-    }
-    /*per riempire il vettore stats*/
-    compute_stats(out);
-    /*l'immagine fornita in ingresso nella funzione non serve più, quindi può essere liberata*/
-    ip_mat_free(in);
-    return out;
-}
-
-/*///////////////////FUNZIONI FEDERICO////////////////////*/
+/*///////////////////FUNZIONI FEDERICO PARTE 1////////////////////*/
 
 
 /* ###########################
@@ -464,6 +403,347 @@ ip_mat * ip_mat_mean (ip_mat *a, ip_mat *b)
 
 /*//////////////Yamina & Christian FUNCTIONS//////////////*/
 
+/* ###############
+   ### PARTE 2 ###
+   ############### */
+
+/*
+IP_MAT_TO_GRAY_SCALE
+Autore: Federico
+Descrizione: prende un'immagine colorata e la rende in scala di grigi. Si calcola la media
+            dei tre canali per ogni pixel e viene assegnata al primo livello per ogni pixel.
+            Calcolato per tutto il primo livello, si copiano i valori anche sugli altri 2 livelli.
+*/
+
+ip_mat * ip_mat_to_gray_scale(ip_mat * in)
+{
+    /*k è canale(livello), h = righe(rig), w = colonne(col)*/
+    unsigned int liv, rig, col;
+    float totale = 0, media = 0;
+    /*ne creo una nuova con tutti gli elementi a 0*/
+    ip_mat *out = ip_mat_create(in -> h, in -> w, in -> k, 0);
+
+    for(rig = 0; rig < in -> h; rig++)
+    {
+        for(col = 0; col < in -> w; col++)
+        {
+            /*calcolo la media di ogni pixel e la scrivo sui pixel del primo canale*/
+            totale = 0;
+            for(liv = 0; liv < in -> k; liv++)
+            {
+                totale += in -> data[liv][rig][col];
+            }
+            /*finito il ciclo, è stata calcolata la somma dello stesso pixel sui livelli
+            quindi ora non resta che calcolare la media e assegnarla alla cella in cui stiamo "puntando"
+            in questo momento. Così poi passiamo alla successiva e ripetiamo*/
+            media = totale / in -> k;
+            out -> data[0][rig][col] = media;
+        }
+    }
+    /*finito questo, significa che abbiamo iterato per tutto il primo canale, assegnando ad ogni
+    pixel la sua media. Ora bisogna assegnare i corrispettivi valori dei pixel anche ai livelli successivi*/
+
+    for(rig = 0; rig < in -> h; rig++)
+    {
+        for(col = 0; col < in -> w; col++)
+        {
+            /*ai canali successivi al primo (lo 0) assegno i valori presenti nel primo. Ovvero, copio i valori
+            del primo livello nel secondo e nel terzo, cella per cella, scorrendo i canali. Poi passo all'elemento
+            successivo del primo livello (col++) e ripeto*/
+            for(liv = 1; liv < in -> k; liv++)
+            {
+                out -> data[liv][rig][col]= out -> data[0][rig][col];
+            }
+        }
+    }
+    /*per riempire il vettore stats*/
+    compute_stats(out);
+    /*l'immagine fornita in ingresso nella funzione non serve più, quindi può essere liberata*/
+    /*ip_mat_free(in); c'è già sul main*/
+    return out;
+}
+
+/*
+IP_MAT_BLEND
+Autore: Tom
+Descrizione: Unisce due immagini assieme, queste devono essere della stessa dimensione (anche i canali).
+	     La funzione non modifica i parametri in ingresso ma crea una nuova ip_mat su cui scrive i risultati delle computazioni.
+*/
+ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha) {
+    ip_mat *x;
+    unsigned int liv, rig, col;
+    x = NULL;
+
+    /*control if all dimensions are equal
+    Credete sia necessario anche verificare se i canali sono 3? */
+    if(a->h == b->h && a->w == b->w && a->k == b->k) {
+        /* ho richiamato la funzione create per assegnare le tre dimensioni ed allocare stats e data */
+        x = ip_mat_create(a->h, a->w, a->k, 1.0);  /*prima era scritto in, ma non esiste, allora ho messo a per coerenza con l'if. Controllare se è corretto*/
+
+        /* ora assegnamo i valori di data di in a x */
+        for ( liv=0; liv<x->k; liv++ ) {
+            for ( rig=0; rig<x->h; rig++ ) {
+                for ( col=0; col<x->w; col++ ) {
+                    x->data[liv][rig][col] = (unsigned int) (alpha * (a->data[liv][rig][col]) + (1-alpha) * (b->data[liv][rig][col]));
+                }
+            }
+        }
+
+        /* calcolo le statistiche su x */
+        compute_stats(x);
+    }
+
+    /* la funzione restituisce NULL se le dimensioni di a e b non sono uguali */
+    return x;
+}
+
+/*
+	IP_MAT_CORRUPT
+	Autori: Fatta da tutti assieme in videochiamata
+*/
+ip_mat * ip_mat_corrupt(ip_mat * in, float amount) {
+    ip_mat *x;  /* ho creato il puntatore ad una nuova struttura ip_mat */
+    unsigned int liv, rig, col;
+    /* ho richiamato la funzione copy per copiare la ip_mat in entrata */
+    x = ip_mat_copy(in);
+
+    /* ora assegnamo i valori di data di in a x */
+    for ( liv=0; liv<in->k; liv++ ) {
+        for ( rig=0; rig<in->h; rig++ ) {
+            for ( col=0; col<in->w; col++ ) {
+                x->data[liv][rig][col] = (x->data[liv][rig][col])+(get_normal_random(amount,x->stat[liv].mean)*amount);
+            }
+        }
+    }
+
+    return x;
+}
+
+/* ####################
+   ### FINE PARTE 2 ###
+   #################### */
+
+/* ###############
+   ### PARTE 3 ###
+   ############### */
+
+/*
+IP_MAT_PADDING
+Autore: Tom
+Descrizione: Funzione per aggiungere un padding ad una ip_mat passata.
+	     Non lavora direttamente sulla ip_mat passata in input ma ne genera una copia (x) su cui viene elaborato il tutto.
+*/
+ip_mat * ip_mat_padding(ip_mat * a, unsigned int pad_h, unsigned int pad_w) {
+    ip_mat *x; /* ip_mat dove copierò a e dove eseguirò tutte le operazioni */
+    unsigned int liv, rig, col;
+    x = ip_mat_copy(a);
+
+    for ( liv=0; liv<x->k; liv++ ) {
+        /* sezione superiore */
+        for ( rig=0; rig<pad_h; rig++ ) {
+            for ( col=0; col<x->w; col++ ) {
+                x->data[liv][rig][col] = 0.0;
+            }
+        }
+        /* sezioni laterali - parte sx */
+        for ( rig=pad_h; rig<((x->h)-pad_h); rig++ ) {
+            for ( col=0; col<((x->w)-pad_w); col++ ) {
+                x->data[liv][rig][col] = 0.0;
+            }
+        }
+        /* sezioni laterali - parte dx */
+        for ( rig=pad_h; rig<((x->h)-pad_h); rig++ ) {
+            for ( col=((x->w)-pad_w); col<x->w; col++ ) {
+                x->data[liv][rig][col] = 0.0;
+            }
+        }
+        /* sezione inferiori */
+        for ( rig=(x->h)-pad_h; rig<x->h; rig++ ) {
+            for ( col=0; col<x->w; col++ ) {
+                x->data[liv][rig][col] = 0.0;
+            }
+        }
+    }
+
+    return x;
+}
+
+/*
+CREATE_SHARPEN_FILTER
+Autore: Federico
+Descrizione: Crea un filtro di sharpening
+*/
+ip_mat * create_sharpen_filter()
+{
+    unsigned int liv = 0, rig, col, DIM = 3;
+    ip_mat *filter = ip_mat_create(DIM, DIM, DIM, 0);
+
+    /*per lo 0:
+
+     0   -1    0
+    -1    5   -1
+     0   -1    0
+
+     metto uno 0 ogni volta che sto leggendo una cella che fa parte dei 4 angoli*/
+    for(rig = 0; rig < DIM; rig++)
+    {
+        for(col = 0; col < DIM; col++)
+        {
+            if ( (rig == 0 && col == 0) || (rig == 0 && col == DIM -1) ||
+                 (rig == DIM -1 && col == 0) ||  (rig == DIM -1 && col == DIM -1)
+                )
+            {
+                filter -> data[liv][rig][col] = 0;
+            }
+        }
+    }
+
+    /*per il -1*/
+
+    for(rig = 0; rig < DIM; rig++)
+    {
+        for(col = 0; col < DIM; col++)
+        {
+            if ( (rig == 0 && col == 1) || (rig == 1 && col == 0) ||
+                 (rig == DIM -1 && col == 1) ||  (rig == 1 && col == DIM -1)
+                )
+            {
+                filter -> data[liv][rig][col] = -1;
+            }
+        }
+    }
+
+    /*per il 5*/
+
+    filter -> data[0][1][1] = 5;
+
+    /*copia i valori anche negli altri due livelli*/
+    for(rig = 0; rig < filter -> h; rig++)
+    {
+        for(col = 0; col < filter -> w; col++)
+        {
+            /*ai canali successivi al primo (lo 0) assegno i valori presenti nel primo. Ovvero, copio i valori
+            del primo livello nel secondo e nel terzo, cella per cella, scorrendo i canali. Poi passo all'elemento
+            successivo del primo livello (col++) e ripeto*/
+            for(liv = 1; liv < filter -> k; liv++)
+            {
+                filter -> data[liv][rig][col] = filter -> data[0][rig][col];
+            }
+        }
+    }
+    compute_stats(filter);
+
+    return filter;
+}
+
+/*
+CREATE_EDGE_FILTER
+Autore: Federico
+Descrizione: Crea un filtro per rilevare i bordi
+*/
+
+ip_mat * create_edge_filter()
+{
+    unsigned int liv = 0, rig, col, DIM = 3;
+    ip_mat *filter = ip_mat_create(DIM, DIM, DIM, 0);
+
+    for(rig = 0; rig < DIM; rig++)
+    {
+        for(col = 0; col < DIM; col++)
+        {
+            if ( rig == DIM -1 && col == DIM -1 )
+            {
+                filter -> data[liv][rig][col] = 8;
+            }
+            else
+                filter -> data[liv][rig][col] = -1;
+        }
+    }
+    /*copia i valori anche negli altri due livelli*/
+    for(rig = 0; rig < filter -> h; rig++)
+    {
+        for(col = 0; col < filter -> w; col++)
+        {
+            /*ai canali successivi al primo (lo 0) assegno i valori presenti nel primo. Ovvero, copio i valori
+            del primo livello nel secondo e nel terzo, cella per cella, scorrendo i canali. Poi passo all'elemento
+            successivo del primo livello (col++) e ripeto*/
+            for(liv = 1; liv < filter -> k; liv++)
+            {
+                filter -> data[liv][rig][col] = filter -> data[0][rig][col];
+            }
+        }
+    }
+    compute_stats(filter);
+
+    return filter;
+}
+
+/*
+CREATE_EMBOSS_FILTER
+Autore: Federico
+Descrizione: Crea un filtro per aggiungere profondità */
+ip_mat * create_emboss_filter()
+{
+    unsigned int liv, rig, col, DIM = 3;
+    ip_mat *filter = ip_mat_create(DIM, DIM, DIM, 0);
+
+    filter -> data[0][0][0] = -2;
+    filter -> data[0][0][1] = -1;
+    filter -> data[0][0][2] = 0;
+
+    filter -> data[0][1][0] = -1;
+    filter -> data[0][1][1] = 1;
+    filter -> data[0][1][2] = 1;
+
+    filter -> data[0][2][0] = 0;
+    filter -> data[0][2][1] = 1;
+    filter -> data[0][2][2] = 2;
+
+    /*copia i valori anche negli altri due livelli*/
+    for(rig = 0; rig < filter -> h; rig++)
+    {
+        for(col = 0; col < filter -> w; col++)
+        {
+            /*ai canali successivi al primo (lo 0) assegno i valori presenti nel primo. Ovvero, copio i valori
+            del primo livello nel secondo e nel terzo, cella per cella, scorrendo i canali. Poi passo all'elemento
+            successivo del primo livello (col++) e ripeto*/
+            for(liv = 1; liv < filter -> k; liv++)
+            {
+                filter -> data[liv][rig][col] = filter -> data[0][rig][col];
+            }
+        }
+    }
+
+    compute_stats(filter);
+    return filter;
+}
+
+/*
+CREATE_AVERAGE_FILTER
+Autore: Federico
+Descrizione:Crea un filtro medio per la rimozione del rumore
+*/
+ip_mat * create_average_filter(unsigned int h, unsigned int w, unsigned int k)
+{
+    unsigned int liv, rig, col;
+    float c = 1/(w*h);
+    ip_mat *filter = ip_mat_create(h, w, k, 0);
+
+    for(liv = 0; liv < k; liv++)
+        for(rig = 0; rig < h; rig++)
+            for(col = 0; col < w; col++)
+                filter -> data[liv][rig][col] = c;
+
+    compute_stats(filter);
+    return filter;
+}
+
+/* ####################
+   ### FINE PARTE 3 ###
+   #################### */
+
+/* ************** FUNZIONI GIÀ IMPLEMENTATE ***********************************
+*************************************************************************** */
 void ip_mat_show(ip_mat * t){
     unsigned int i,l,j;
     printf("Matrix of size %d x %d x %d (hxwxk)\n",t->h,t->w,t->k);
@@ -561,107 +841,5 @@ float get_normal_random(float media, float std){
 
     return media + num*std;
 }
-
-/* 
-	IP_MAT_CORRUPT
-	Autori: Fatta da tutti assieme in videochiamata 
-*/
-ip_mat * ip_mat_corrupt(ip_mat * in, float amount) {
-    ip_mat *x;  /* ho creato il puntatore ad una nuova struttura ip_mat */
-    unsigned int liv, rig, col;
-    /* ho richiamato la funzione copy per copiare la ip_mat in entrata */
-    x = ip_mat_copy(in);
-
-    /* ora assegnamo i valori di data di in a x */
-    for ( liv=0; liv<in->k; liv++ ) {
-        for ( rig=0; rig<in->h; rig++ ) {
-            for ( col=0; col<in->w; col++ ) {
-                x->data[liv][rig][col] = (x->data[liv][rig][col])+(get_normal_random(amount,x->stat[liv].mean)*amount);
-            }
-        }
-    }
-
-    return x;
-}
-
-
-/*  
-IP_MAT_BLEND
-Autore: Tom
-Descrizione: Unisce due immagini assieme, queste devono essere della stessa dimensione (anche i canali).
-	     La funzione non modifica i parametri in ingresso ma crea una nuova ip_mat su cui scrive i risultati delle computazioni.
-*/
-ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha) {
-    ip_mat *x;
-    unsigned int liv, rig, col;
-    x = NULL;
-
-    /*control if all dimensions are equal
-    Credete sia necessario anche verificare se i canali sono 3? */
-    if(a->h == b->h && a->w == b->w && a->k == b->k) {
-        /* ho richiamato la funzione create per assegnare le tre dimensioni ed allocare stats e data */
-        x = ip_mat_create(in->h, in->w, in->k, 1.0);
-
-        /* ora assegnamo i valori di data di in a x */
-        for ( liv=0; liv<x->k; liv++ ) {
-            for ( rig=0; rig<x->h; rig++ ) {
-                for ( col=0; col<x->w; col++ ) {
-                    x->data[liv][rig][col] = (unsigned int) (alpha * (a->data[liv][rig][col]) + (1-alpha) * (b->data[liv][rig][col]));
-                }
-            }
-        }
-
-        /* calcolo le statistiche su x */
-        compute_stats(x);
-    }
-
-    /* la funzione restituisce NULL se le dimensioni di a e b non sono uguali */
-    return x;
-}
-
-
-
-/* ############### 
-   ### PARTE 3 ### 
-   ############### */
-
-/* 
-IP_MAT_PADDING
-Autore: Tom
-Descrizione: Funzione per aggiungere un padding ad una ip_mat passata.
-	     Non lavora direttamente sulla ip_mat passata in input ma ne genera una copia (x) su cui viene elaborato il tutto.
-*/
-ip_mat * ip_mat_padding(ip_mat * a, unsigned int pad_h, unsigned int pad_w) {
-    ip_mat *x; /* ip_mat dove copierò a e dove eseguirò tutte le operazioni */
-    unsigned int liv, rig, col;
-    x = ip_mat_copy(a);
-
-    for ( liv=0; liv<x->k; liv++ ) {
-        /* sezione superiore */
-        for ( rig=0; rig<pad_h; rig++ ) {
-            for ( col=0; col<x->w; col++ ) {
-                x->data[liv][rig][col] = 0.0;
-            }
-        }
-        /* sezioni laterali - parte sx */
-        for ( rig=pad_h; rig<((x->h)-pad_h); rig++ ) {
-            for ( col=0; col<((x->w)-pad_w); col++ ) {
-                x->data[liv][rig][col] = 0.0;
-            }
-        }
-        /* sezioni laterali - parte dx */
-        for ( rig=pad_h; rig<((x->h)-pad_h); rig++ ) {
-            for ( col=((x->w)-pad_w); col<x->w; col++ ) {
-                x->data[liv][rig][col] = 0.0;
-            }
-        }
-        /* sezione inferiori */
-        for ( rig=()(x->h)-pad_h); rig<x->h; rig++ ) {
-            for ( col=0; col<x->w; col++ ) {
-                x->data[liv][rig][col] = 0.0;
-            }
-        }
-    }
-
-    return x;
-}
+/* ************** FUNZIONI GIÀ IMPLEMENTATE ***********************************
+*************************************************************************** */

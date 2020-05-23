@@ -25,13 +25,6 @@ Guida all'uso di valgrind con gdb: https://valgrind.org/docs/manual/manual-core-
 capitolo 3.2.1
 */
 
-ip_mat * ip_mat_corrupt(ip_mat * a, float amount){
-    return NULL;
-}
-
-ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha){
-    return NULL;
-}
 
 ip_mat * ip_mat_brighten(ip_mat * a, float bright){
     return NULL;
@@ -44,22 +37,6 @@ void clamp(ip_mat * t, float low, float high)
 }
 
 ip_mat * ip_mat_convolve(ip_mat * a, ip_mat * f){
-    return NULL;
-}
-
-ip_mat * create_sharpen_filter(){
-    return NULL;
-}
-
-ip_mat * create_edge_filter(){
-    return NULL;
-}
-
-ip_mat * create_emboss_filter(){
-    return NULL;
-}
-
-ip_mat * create_average_filter(unsigned int h, unsigned int w, unsigned int k){
     return NULL;
 }
 
@@ -197,7 +174,7 @@ int main(int argc, char *argv[])
         img = temp;
     }
 
-    /*ip_mat_free(input_img); *//* libera la memoria dalla ip_mat contenente l'immagine di input */
+    ip_mat_free(input_img); /* libera la memoria dalla ip_mat contenente l'immagine di input */
 
     b2 = ip_mat_to_bitmap(img); /* converti l'immagine di output in una bitmap */
 
