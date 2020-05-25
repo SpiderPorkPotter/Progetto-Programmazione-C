@@ -795,6 +795,28 @@ void clamp(ip_mat * t, float low, float high) {
 }
 
 
+/*
+RESCALE
+Autori: Tutto il gruppo in chiamata
+Descrizione: Scaliamo la matrice secondo la formula (valore-min)/(max - min). Max e min li prendo da stats e variano da canale a canale.
+	     Poi moltiplichiamo i valori della matrice per new_max in modo tale da avere tutti i valori della matrice tra 0 e new_max.
+*/
+void rescale(ip_mat * t, float new_max) {
+	unsigned int liv, rig, col;
+	
+	for(liv = 0; liv < t->k; liv++) {
+        	for(rig = 0; rig < t->h; rig++) {
+            		for(col = 0; col < t->w; col++) {
+				/* Scalo la matrice secondo la formula (valore-min)/(max - min). */
+				t->data[liv][rig][col] = ( t->data[liv][rig][col] - t->stat[liv].min )  /  ( t->stat[liv].max - t->stat[liv].min );
+				/* Moltiplico i valori della matrice per new_max */
+				t->data[liv][rig][col] = t->data[liv][rig][col] * new_max;
+			}
+		}
+	}
+	
+}
+
 
 
 /* ####################
