@@ -150,6 +150,8 @@ ip_mat * ip_mat_to_gray_scale(ip_mat * in);
  *
  * I parametri della funzione non subiscono modiche, il risultato viene salvato e restituito in output
  * all'interno di una nuova ip_mat.
+ *
+ * Le variabili "a" e "b" devono avere le stesse dimensioni
  */
 ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha);
 

@@ -3,21 +3,6 @@
 #include "ip_lib.h"
 #include "bmp.h"
 
-void clamp(ip_mat * t, float low, float high)
-{
-    int cane = 1;
-    cane++;
-}
-
-ip_mat * ip_mat_convolve(ip_mat * a, ip_mat * f){
-    return NULL;
-}
-/* Crea un filtro gaussiano per la rimozione del rumore */
-ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, float sigma)
-{
-    return NULL;
-}
-
 void show_help(){
     printf("*** Image Processing Toolbox ***\n");
     printf("\targ 1: input file name (img1) \n");
@@ -90,6 +75,7 @@ int main (int argc, char * argv[]) {
 
     if (strcmp(operation, "corrupt") == 0) {
         img = ip_mat_corrupt(input_img, k_size);  /* corrompi l'immagine con del rumore */
+        clamp(img,0,255); /* effettua il clamping dei valori in 0-255 */
     }
     else if (strcmp(operation, "brighten") == 0) {
         img = ip_mat_brighten(input_img, k_size); /* aumenta la luminosità */
