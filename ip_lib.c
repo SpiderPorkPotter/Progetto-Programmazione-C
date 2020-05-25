@@ -770,6 +770,33 @@ ip_mat * create_average_filter(unsigned int h, unsigned int w, unsigned int k)
     return filter;
 }
 
+
+
+/*
+CLAMP
+Autore: Tom
+Descrizione; controlla che i valori dei tre canali di ogni pixel siano compresi tra 0 e 255 (estremi compresi)
+*/
+void clamp(ip_mat * t, float low, float high) {
+	unsigned int liv, rig, col;
+	
+	for(liv = 0; liv < t->k; liv++) {
+        	for(rig = 0; rig < t->h; rig++) {
+            		for(col = 0; col < t->w; col++) {
+				if ( t->data[liv][rig][col] > high ) {
+					t->data[liv][rig][col] = high;
+				}
+				else if ( t->data[liv][rig][col] < low ) {
+					t->data[liv][rig][col] = low;
+				}
+			}
+		}
+	}
+}
+
+
+
+
 /* ####################
    ### FINE PARTE 3 ###
    #################### */
