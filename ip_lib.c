@@ -115,10 +115,10 @@ void ip_mat_free(ip_mat *a)
     	{
     		for (rig = 0; rig < a -> h; rig++)
     		{
-                if(a -> data[liv][rig] != NULL)
+                /*if(a -> data[liv][rig] != NULL)*/
                     free(a -> data[liv][rig]);
             }
-            if(a -> data[liv][rig] != NULL)
+        /*    if(a -> data[liv][rig] != NULL)*/
                 free(a -> data[liv]);
     	}
     	free(a -> data);
@@ -726,8 +726,8 @@ Descrizione: Crea un filtro di sharpening
 */
 ip_mat * create_sharpen_filter()
 {
-    unsigned int liv = 0, rig, col, DIM = 3;
-    ip_mat *filter = ip_mat_create(DIM, DIM, DIM, 0);
+    unsigned int liv = 0, rig, col, dim = 3;
+    ip_mat *filter = ip_mat_create(dim, dim, dim, 0);
 
     /*per lo 0:
 
@@ -736,12 +736,12 @@ ip_mat * create_sharpen_filter()
      0   -1    0
 
      metto uno 0 ogni volta che sto leggendo una cella che fa parte dei 4 angoli*/
-    for(rig = 0; rig < DIM; rig++)
+    for(rig = 0; rig < dim; rig++)
     {
-        for(col = 0; col < DIM; col++)
+        for(col = 0; col < dim; col++)
         {
-            if ( (rig == 0 && col == 0) || (rig == 0 && col == DIM -1) ||
-                 (rig == DIM -1 && col == 0) ||  (rig == DIM -1 && col == DIM -1)
+            if ( (rig == 0 && col == 0) || (rig == 0 && col == dim -1) ||
+                 (rig == dim -1 && col == 0) ||  (rig == dim -1 && col == dim -1)
                 )
             {
                 filter -> data[liv][rig][col] = 0;
@@ -751,12 +751,12 @@ ip_mat * create_sharpen_filter()
 
     /*per il -1*/
 
-    for(rig = 0; rig < DIM; rig++)
+    for(rig = 0; rig < dim; rig++)
     {
-        for(col = 0; col < DIM; col++)
+        for(col = 0; col < dim; col++)
         {
             if ( (rig == 0 && col == 1) || (rig == 1 && col == 0) ||
-                 (rig == DIM -1 && col == 1) ||  (rig == 1 && col == DIM -1)
+                 (rig == dim -1 && col == 1) ||  (rig == 1 && col == dim -1)
                 )
             {
                 filter -> data[liv][rig][col] = -1;
@@ -795,14 +795,14 @@ Descrizione: Crea un filtro per rilevare i bordi
 
 ip_mat * create_edge_filter()
 {
-    unsigned int liv = 0, rig, col, DIM = 3;
-    ip_mat *filter = ip_mat_create(DIM, DIM, DIM, 0);
+    unsigned int liv = 0, rig, col, dim = 3;
+    ip_mat *filter = ip_mat_create(dim, dim, dim, 0);
 
-    for(rig = 0; rig < DIM; rig++)
+    for(rig = 0; rig < dim; rig++)
     {
-        for(col = 0; col < DIM; col++)
+        for(col = 0; col < dim; col++)
         {
-            if ( rig == DIM -1 && col == DIM -1 )
+            if ( rig == dim -1 && col == dim -1 )
             {
                 filter -> data[liv][rig][col] = 8;
             }
@@ -835,8 +835,8 @@ Autore: Federico
 Descrizione: Crea un filtro per aggiungere profondità */
 ip_mat * create_emboss_filter()
 {
-    unsigned int liv, rig, col, DIM = 3;
-    ip_mat *filter = ip_mat_create(DIM, DIM, DIM, 0);
+    unsigned int liv, rig, col, dim = 3;
+    ip_mat *filter = ip_mat_create(dim, dim, dim, 0);
 
     filter -> data[0][0][0] = -2;
     filter -> data[0][0][1] = -1;
@@ -1034,14 +1034,14 @@ ip_mat * ip_mat_convolve(ip_mat * a, ip_mat * f) {
 	for(liv = 0; liv < x->k; liv++) {
         	for(rig = pad_h; rig < x->h - pad_h; rig++) {
             		for(col = pad_w; col < x->w - pad_w; col++) {
-				/* ora calcolo il risultato da inserire */
-				value = 0.0; /* resetto value per non avere valori "sporchi" */
-				for ( rig1 = rig-pad_h; f->h; rig1++ ) {
-					for ( col1 = col-pad_w; f->w; col++ ) {
-						value = value +  (a->data[liv][rig1][col1] * f->data[liv][rig1-rig][col1-col] );
-					}
-				}
-				x->data[liv][rig][col] = value ;
+        				/* ora calcolo il risultato da inserire */
+        				value = 0.0; /* resetto value per non avere valori "sporchi" */
+        				for ( rig1 = rig-pad_h; f->h; rig1++ ) {
+        					for ( col1 = col-pad_w; f->w; col++ ) {
+        						value = value +  (a->data[liv][rig1][col1] * f->data[liv][rig1-rig][col1-col] );
+        					}
+        				}
+                x->data[liv][rig][col] = value ;
 			}
 		}
 	}
