@@ -729,6 +729,12 @@ ip_mat * create_sharpen_filter()
     unsigned int liv = 0, rig, col, dim = 3;
     ip_mat *filter = ip_mat_create(dim, dim, dim, 0);
 
+    if(filter == NULL)
+    {
+        printf("Errore! Impossibile allocare Ipmat\n");
+        exit(1);
+    }
+
     /*per lo 0:
 
      0   -1    0
@@ -798,6 +804,12 @@ ip_mat * create_edge_filter()
     unsigned int liv = 0, rig, col, dim = 3;
     ip_mat *filter = ip_mat_create(dim, dim, dim, 0);
 
+    if(filter == NULL)
+    {
+        printf("Errore! Impossibile allocare Ipmat\n");
+        exit(1);
+    }
+
     for(rig = 0; rig < dim; rig++)
     {
         for(col = 0; col < dim; col++)
@@ -838,6 +850,12 @@ ip_mat * create_emboss_filter()
     unsigned int liv, rig, col, dim = 3;
     ip_mat *filter = ip_mat_create(dim, dim, dim, 0);
 
+    if(filter == NULL)
+    {
+        printf("Errore! Impossibile allocare Ipmat\n");
+        exit(1);
+    }
+
     filter -> data[0][0][0] = -2;
     filter -> data[0][0][1] = -1;
     filter -> data[0][0][2] = 0;
@@ -877,7 +895,7 @@ Descrizione:Crea un filtro medio per la rimozione del rumore
 ip_mat * create_average_filter(unsigned int h, unsigned int w, unsigned int k)
 {
     unsigned int liv, rig, col;
-    float c = 1/(w*h);
+    float c = 1.0/(w*h);
     ip_mat *filter;
 
     if(h != w)
@@ -889,9 +907,15 @@ ip_mat * create_average_filter(unsigned int h, unsigned int w, unsigned int k)
     filter = ip_mat_create(h, w, k, 0);
 
     for(liv = 0; liv < k; liv++)
+    {
         for(rig = 0; rig < h; rig++)
+        {
             for(col = 0; col < w; col++)
+            {
                 filter -> data[liv][rig][col] = c;
+            }
+        }
+    }
 
     compute_stats(filter);
     return filter;
@@ -908,7 +932,7 @@ ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, 
     /*per trovare il centro del filtro, se le dimensioni sono uguali, vale da origine sia per righe che per le colonne*/
     int centro = w / 2;
     /*per la calcolare la somma dei valori del kernel (filter -> data), necessaria per la normalizzazione*/
-    float somma = 0.0;
+    float somma[k];
 
     /*se le dimensioni passate non identificano una matrice quadrata*/
     if(h != w)
@@ -917,7 +941,9 @@ ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, 
         exit(1);
     }
 
-    filter = ip_mat_create(h, w, k, 0);
+    /*filter = ip_mat_create(9,9,9, 0.0);*/
+    sigma = 1.0;
+    filter = ip_mat_create(h, w, k, 0.0);
 
     for(liv = 0; liv < k; liv++)
     {
@@ -926,9 +952,11 @@ ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, 
             for(col = 0; col < w; col++)
             {
                 /*traduzione della formula della distribuzione gaussiana*/
-                filter -> data[liv][rig][col] = exp( -0.5 * ( pow( (rig - centro) / sigma, 2.0 ) + pow( (col - centro) / sigma, 2.0 )) )
+                filter -> data[liv][rig][col] = exp( -0.5 * ( pow( (rig - centro) / sigma, 2.0 )
+                                                + pow( (col - centro) / sigma, 2.0 )) )
                                                     / (2 * M_PI * sigma * sigma);
-                somma += filter -> data[liv][rig][col];
+                /*filter -> data[liv][rig][col] = ;*/
+                somma[liv] += filter -> data[liv][rig][col];
             }
         }
     }
@@ -937,7 +965,7 @@ ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, 
     for(liv = 0; liv < k; liv++)
         for(rig = 0; rig < h; rig++)
             for(col = 0; col < w; col++)
-                filter -> data[liv][rig][col] /= somma;
+                filter -> data[liv][rig][col] /= somma[liv];
 
     return filter;
 
@@ -1010,7 +1038,7 @@ ip_mat * ip_mat_convolve(ip_mat * a, ip_mat * f) {
 	ip_mat *x;
 	int pad_h, pad_w;
 	float value; /* value è la variabile dove mi salvo il valore calcolato dall'incrocio dei valori di a su f */
-	unsigned int liv, rig, col, rig1, col1; /* rig1 e col1 li utilizzerò per muovermi su a->data per ottenere i valori da calcolare sulla matrice filtro */
+	unsigned int liv, rig, col, rig1, col1, i, j; /* rig1 e col1 li utilizzerò per muovermi su a->data per ottenere i valori da calcolare sulla matrice filtro */
 
     if((a == NULL || f == NULL) || (a == NULL && f == NULL))
     {
@@ -1036,9 +1064,11 @@ ip_mat * ip_mat_convolve(ip_mat * a, ip_mat * f) {
             		for(col = pad_w; col < x->w - pad_w; col++) {
         				/* ora calcolo il risultato da inserire */
         				value = 0.0; /* resetto value per non avere valori "sporchi" */
-        				for ( rig1 = rig-pad_h; f->h; rig1++ ) {
-        					for ( col1 = col-pad_w; f->w; col++ ) {
-        						value = value +  (a->data[liv][rig1][col1] * f->data[liv][rig1-rig][col1-col] );
+                        i = 0;
+                        for ( rig1 = rig-pad_h; i < f->h; rig1++, i++ ) {
+                            j = 0;
+        					for ( col1 = col-pad_w; j < f->w; col1++, j++) {
+        						value = value +  (a->data[liv][rig1][col1] * f->data[liv][i][j] );
         					}
         				}
                 x->data[liv][rig][col] = value ;
