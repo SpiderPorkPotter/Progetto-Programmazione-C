@@ -1,16 +1,12 @@
-obj = vm.o execute.o machinecode.o print.o checkregisters.o
-ex = vm
-flgs = -g3 -fsanitize=address -fsanitize=undefined -stf=gnu89 -pedantic-errors -Wall -Wextra
-libs = -lm
+all: ip_lib.o bmp.o
+	gcc main_iplib.c ip_lib.c bmp.c -Wall --ansi --pedantic -lm -g3 -O3 -fsanitize=address -fsanitize=undefined -std=gnu89 -Wextra -g -Wall -O1 -o test
 
-$(ex) : $(obj)
-	gcc $(flgs) -o $(ex) $(obj) $(libs)
+ip_lib.o :
+	gcc -c -Wall --ansi --pedantic -lm -g3 -O3 -fsanitize=address -fsanitize=undefined -std=gnu89 -Wextra ip_lib.c
 
-clean :
-	rm $(ex) $(obj)
+bmp.o :
+	gcc -c -Wall --ansi --pedantic -lm -g3 -O3 -fsanitize=address -fsanitize=undefined -std=gnu89 -Wextra bmp.c
 
-.c.o :
-	gcc -c $(flgs) $<
-
-.h.c :
-	touch $<
+clean:
+	rm ip_lib.o
+	rm bmp.o
