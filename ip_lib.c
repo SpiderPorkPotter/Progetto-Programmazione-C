@@ -1012,17 +1012,18 @@ void clamp(ip_mat * t, float low, float high) {
     }
 
 	for(liv = 0; liv < t->k; liv++) {
-        	for(rig = 0; rig < t->h; rig++) {
-            		for(col = 0; col < t->w; col++) {
-        				if ( t->data[liv][rig][col] > high ) {
-        					t->data[liv][rig][col] = high;
-        				}
-        				else if ( t->data[liv][rig][col] < low ) {
-        					t->data[liv][rig][col] = low;
-        				}
-			        }
-		    }
+    	for(rig = 0; rig < t->h; rig++) {
+    		for(col = 0; col < t->w; col++) {
+    		    if ( t->data[liv][rig][col] > high ) {
+        			t->data[liv][rig][col] = high;
+        		}
+        		else if ( t->data[liv][rig][col] < low ) {
+        			t->data[liv][rig][col] = low;
+        		}
+			}
+		}
 	}
+    
 }
 
 
