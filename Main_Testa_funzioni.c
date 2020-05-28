@@ -27,7 +27,7 @@ Guida all'uso di valgrind con gdb: https://valgrind.org/doc==2601== Use --track-
 capitolo 3.2.1
 */
 
-
+/*
 void clamp(ip_mat * t, float low, float high)
 {
     int cane = 1;
@@ -38,9 +38,11 @@ ip_mat * ip_mat_convolve(ip_mat * a, ip_mat * f){
     return NULL;
 }
 
+
 ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, float sigma){
     return NULL;
 }
+*/
 
 void show_help(){
     printf("*** Image Processing Toolbox ***\n");
