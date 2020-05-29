@@ -4,6 +4,7 @@
 #include "ip_lib.h"
 #include "bmp.h"
 
+/*commento prova*/
 /*per compilazione iniziale:
     gcc Main_Testa_funzioni.c ip_lib.c bmp.c -lm -g -Wall -O1 -o test
     ulteriori flag con cui verrà compilato il progetto:
