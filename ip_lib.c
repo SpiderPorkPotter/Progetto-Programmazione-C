@@ -124,7 +124,6 @@ void ip_mat_free(ip_mat *a)
         }
         free(a);
     }
-
 }
 
 ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
@@ -149,6 +148,7 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
     /*se l'allocazione dei tre livelli (canali) va a buon fine*/
     if( ( Ipmat -> data = (float***) malloc(k * sizeof(float**)) ) )
     {
+
         for(liv = 0; liv < k; liv++ ) /*per ogni livello*/
         {
             if( ( Ipmat -> data[liv] = (float**) malloc(h * sizeof(float*)) ) ) /*alloca h righe (puntatori)*/
@@ -454,29 +454,17 @@ ip_mat * ip_mat_add_scalar (ip_mat *a, float c)
 
     out = ip_mat_create(a->h, a->w, a->k, 0);  /*create the ip_mat output*/
 
-    for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
+    for(liv = 0; liv < out->k; liv++) /*cycle to scroll the depth*/
     {
-        for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
+        for(rig = 0; rig < out->h; rig++) /*cycle to scroll the height*/
         {
-            for(col = 0; col < a->w; col++) /*cycle to scroll the width*/
+            for(col = 0; col < out->w; col++) /*cycle to scroll the width*/
             {
-                /*if( (a->data[liv][rig][col] + c) > 255 )
-                {
-                    out->data[liv][rig][col] = 255;
-                }
-                else if( (a->data[liv][rig][col] + c) < 0 )
-                {
-                    out->data[liv][rig][col] = 0;
-                }
-                else
-                    out->data[liv][rig][col] = a->data[liv][rig][col] + c;*/
                 out->data[liv][rig][col] = (a->data[liv][rig][col]) + c;
             }
         }
     }
-
     clamp(out,0,255);
-
     return out;
 }
 
@@ -623,7 +611,6 @@ Descrizione: aumenta la luminosità dell'immagine, aggiunge ad ogni pixel un cer
 ip_mat * ip_mat_brighten(ip_mat * a, float bright)
 {
     ip_mat *out;
-    unsigned int liv, rig, col;
 
     if(a == NULL)
     {
@@ -631,21 +618,8 @@ ip_mat * ip_mat_brighten(ip_mat * a, float bright)
         exit(1);
     }
 
-    out = ip_mat_create(a->h, a->w, a->k, 0); /*create the ip_mat output*/
-
-   for(liv = 0; liv < a->k; liv++) /*cycle to scroll the depth*/
-    {
-        for(rig = 0; rig < a->h; rig++) /*cycle to scroll the height*/
-        {
-            for(col = 0; col < a->w; col++) /*cycle to scroll the width*/
-            {
-                out->data[liv][rig][col] = (a->data[liv][rig][col]) + bright;
-            }
-        }
-    }
-
+    out = ip_mat_add_scalar(a, bright);
     compute_stats(out);
-
     return out;
 }
 
@@ -655,10 +629,9 @@ ip_mat * ip_mat_brighten(ip_mat * a, float bright)
 	Autori: Fatta da tutti assieme in videochiamata
 */
 ip_mat * ip_mat_corrupt(ip_mat * in, float amount) {
-    ip_mat *x;  /* ho creato il puntatore ad una nuova struttura ip_mat */
+    ip_mat *out;  /* ho creato il puntatore ad una nuova struttura ip_mat */
     unsigned int liv, rig, col;
     float ris;
-    /* amount = 255; */
 
     if(in == NULL)
     {
@@ -667,29 +640,18 @@ ip_mat * ip_mat_corrupt(ip_mat * in, float amount) {
     }
 
     /* ho richiamato la funzione copy per copiare la ip_mat in entrata */
-    x = ip_mat_copy(in);
-
+    out = ip_mat_copy(in);
 
     /* ora assegnamo i valori di data di in a x */
     for ( liv=0; liv<in->k; liv++ ) {
         for ( rig=0; rig<in->h; rig++ ) {
             for ( col=0; col<in->w; col++ ) {
-                ris = (in->data[liv][rig][col]) + amount * get_normal_random(x->stat[liv].mean, amount);
-                /*if( ris  > 255 )
-                {
-                    x->data[liv][rig][col] = 255;
-                }
-                else if( ris < 0 )
-                {
-                    x->data[liv][rig][col] = 0;
-                }
-                else*/
-                    x->data[liv][rig][col] = ris;
+                ris = (in->data[liv][rig][col]) +  get_normal_random(0, amount/2);
+                out->data[liv][rig][col] = ris;
             }
         }
     }
-
-    return x;
+    return out;
 }
 
 /* ####################
@@ -819,7 +781,7 @@ ip_mat * create_sharpen_filter()
             }
         }
     }
-    compute_stats(filter); 
+    compute_stats(filter);
 
     return filter;
 }
@@ -868,12 +830,6 @@ ip_mat * create_edge_filter()
             }
         }
     }
-
-    /* per stampare contenuto filtro */
-    ip_mat_show(filter);
-
-
-
     compute_stats(filter);
 
     return filter;
@@ -975,6 +931,8 @@ ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, 
     double somma[3]; /* abbiamo messo 3 perchè sulle specifiche del progetto è scritto che lavoreremo sempre con matrici data contenenti solo 3 canali per rappresentare il range di colori R G B */
     double x, y;
 
+    for (liv = 0; liv < 3; liv++)
+        somma[liv] = 0.0;
 
     /*se le dimensioni passate non identificano una matrice quadrata*/
     if( h != w || filter == NULL )
@@ -983,9 +941,7 @@ ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, 
         exit(1);
     }
 
-    /*filter = ip_mat_create(9,9,9, 0.0);*/
-    /*sigma = 1.0;*/
-    
+
 
     for(liv = 0; liv < k; liv++)
     {
@@ -1017,16 +973,10 @@ ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, 
             {
                 filter -> data[liv][rig][col] /= somma[liv];
             }
-
         }
-
     }
-
-
     return filter;
-
 }
-
 
 /*
 CLAMP
@@ -1035,9 +985,6 @@ Descrizione; controlla che i valori dei tre canali di ogni pixel siano compresi 
 */
 void clamp(ip_mat * t, float low, float high) {
 	unsigned int liv, rig, col;
-    float low2, high2;
-    low2 = low;
-    high2 = high;
 
     if(t == NULL)
     {
@@ -1048,16 +995,15 @@ void clamp(ip_mat * t, float low, float high) {
 	for(liv = 0; liv < t->k; liv++) {
     	for(rig = 0; rig < t->h; rig++) {
     		for(col = 0; col < t->w; col++) {
-    		    if ( t->data[liv][rig][col] > high2 ) {
-        			t->data[liv][rig][col] = high2;
+    		    if ( t->data[liv][rig][col] > high ) {
+        			t->data[liv][rig][col] = high;
         		}
-        		else if ( t->data[liv][rig][col] < low2 ) {
-        			t->data[liv][rig][col] = low2;
+        		else if ( t->data[liv][rig][col] < low ) {
+        			t->data[liv][rig][col] = low;
         		}
 			}
 		}
 	}
-
 }
 
 
@@ -1095,12 +1041,12 @@ Descrizione: Viene fatta la convoluzione della ip_mat *a (applicando il filtro i
 	     di a. I parametri in ingresso non vengono modificati.
 */
 ip_mat * ip_mat_convolve(ip_mat * a, ip_mat * f) {
-	ip_mat *x;
+	ip_mat *x,*y;
 	int pad_h, pad_w;
 	float value; /* value è la variabile dove mi salvo il valore calcolatoblend dall'incrocio dei valori di a su f */
 	unsigned int liv, rig, col, rig1, col1, i, j; /* rig1 e col1 li utilizzerò per muovermi su a->data per ottenere i valori da calcolare sulla matrice filtro */
 
-    if(a == NULL || f == NULL) 
+    if(a == NULL || f == NULL)
     {
         printf("Errore! IPMAT non valida/e\n");
         exit(1);
@@ -1112,12 +1058,12 @@ ip_mat * ip_mat_convolve(ip_mat * a, ip_mat * f) {
 	pad_w = ( f->w - 1 ) / 2;
 
 	/* creo la nuova ip_mat x su cui scriverò tutte le modifiche */
-	x = ip_mat_create(a->h, a->w, a->k, 0);
+	y = ip_mat_create(a->h, a->w, a->k, 0);
 
 	/* applico la funzione padding ad x (in realtà non serve perchè con la funzione precedente ho già inizializzato tutta la matrice a 0.0
 	   però la funzione a quanto pare bisogna utilizzarla comunque quindi la richiamo lo stesso :) */
-	x = ip_mat_padding(x, pad_h, pad_w);
-
+	x = ip_mat_padding(y, pad_h, pad_w);
+    ip_mat_free(y);
 	/* Salvo dentro x->data il risultato del filtro sulla matrice a */
 	for(liv = 0; liv < x->k; liv++) {
         	for(rig = pad_h; rig < x->h - pad_h; rig++) {
