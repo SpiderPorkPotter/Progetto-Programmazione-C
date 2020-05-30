@@ -1,7 +1,5 @@
 /*
  Created by Sebastiano Vascon on 23/03/20.
-
- WLF
 */
 
 #include <stdio.h>
