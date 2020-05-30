@@ -1,5 +1,5 @@
 /*
-    Gruppo: 
+    Gruppo:
         81 - Geeks
     Componenti:
         875469 Thomas Babato
@@ -44,7 +44,7 @@
 
 
 /*
-    COMPUTE_STATS -> spiegazione 
+    COMPUTE_STATS -> spiegazione
     stat da inizializzare con i valori min, max e mean (media)
 	presenti nei vari livelli della matrice data.
 	Quindi, dei k livelli che formano lo
@@ -57,7 +57,7 @@
 	 		liv 2 ----> min = valore y
 						max = valore yy
 	 					media = valore zzz
-	
+
 	 		liv 3 ----> min = valore z
 	 					max = valore zz
 	 					media = valore zzz
@@ -65,7 +65,7 @@
 void compute_stats(ip_mat * t)
 {
     /*k = canale(liv), h = righe(rig), w = colonne(col)*/
-	unsigned int liv, rig, col; 
+	unsigned int liv, rig, col;
 	int nElem;
 	float totale, minimo, maximo, mid;
 
@@ -119,7 +119,7 @@ void ip_mat_free(ip_mat *a)
         /*libera stat*/
         if(a -> stat != NULL)
             free(a -> stat);
-        
+
         /*elimina prima per ogni cella delle righe, la colonna.
         Terminato il ciclo interno elimina tutte le righe e quindi la matrice.
         Passa al livello (canale) successivo e ripete*/
@@ -137,7 +137,7 @@ void ip_mat_free(ip_mat *a)
             }
             free(a -> data);
         }
-        free(a); 
+        free(a);
     }
 }
 
@@ -170,7 +170,7 @@ ip_mat * ip_mat_create(unsigned int h, unsigned int w,unsigned  int k, float v)
         for(liv = 0; liv < k; liv++ ) /*per ogni livello*/
         {
             /*alloca h righe (puntatori)*/
-            if( ( Ipmat -> data[liv] = (float**) malloc(h * sizeof(float*)) ) ) 
+            if( ( Ipmat -> data[liv] = (float**) malloc(h * sizeof(float*)) ) )
             {
                 for(rig = 0; rig < h; rig++)    /*per ogni puntatore*/
                 {
@@ -296,7 +296,7 @@ ip_mat * ip_mat_copy(ip_mat * in) {
 
     /* faccio elaborare gli stats */
     compute_stats(x);
-    
+
      /* se non si entra nell'if vuol dire che c'è un problema e quindi restituisce NULL, altrimenti ritorna il puntatore del nuovo ip_mat */
      return x;
  }
@@ -307,13 +307,13 @@ ip_mat * ip_mat_concat(ip_mat * a, ip_mat * b, int dimensione) {
     ip_mat *x; /* ho creato il puntatore ad una nuova struttura ip_mat */
     unsigned int liv, rig, col;
     x = NULL;
-    
+
     if( (a == NULL || b == NULL) || ( dimensione < 0) || ( dimensione > 2 ) )
     {
         printf("Errore! IPMAT non valida/e\n");
         exit(1);
     }
-      
+
 
     /* concateno l'altezza */
     if ( dimensione == 0 ) {
@@ -398,7 +398,7 @@ ip_mat *ip_mat_sum (ip_mat *a, ip_mat *b)
     ip_mat *out;
 
     /* controlliamo che tutte le dimensioni siano uguali e che le ip:mat in input siano allocate */
-    if(a == NULL || b == NULL || a->h != b->h || a->w != b->w || a->k != b->k) 
+    if(a == NULL || b == NULL || a->h != b->h || a->w != b->w || a->k != b->k)
     {
         printf("Errore! IPMAT non valida/e\n");
         exit(1);
@@ -408,8 +408,8 @@ ip_mat *ip_mat_sum (ip_mat *a, ip_mat *b)
 
     /* scorri tutta la matrice */
     for(liv = 0; liv < a->k; liv++)
-        for(rig = 0; rig < a->h; rig++) 
-            for(col = 0; col < a->w; col++) 
+        for(rig = 0; rig < a->h; rig++)
+            for(col = 0; col < a->w; col++)
                 out->data[liv][rig][col] = a->data[liv][rig][col] + b->data[liv][rig][col];
 
     return out;
@@ -424,18 +424,18 @@ ip_mat *ip_mat_sub (ip_mat *a, ip_mat *b)
     ip_mat *out;
 
     /* controlliamo che tutte le dimensioni siano uguali e che le ip:mat in input siano allocate */
-    if(a == NULL || b == NULL || a->h != b->h || a->w != b->w || a->k != b->k) 
+    if(a == NULL || b == NULL || a->h != b->h || a->w != b->w || a->k != b->k)
     {
         printf("Errore! IPMAT non valida/e\n");
         exit(1);
     }
 
-    out = ip_mat_create(a->h, a->w, a->k, 0);  
+    out = ip_mat_create(a->h, a->w, a->k, 0);
 
     /* scorri tutta la matrice */
-    for(liv = 0; liv < a->k; liv++) 
-        for(rig = 0; rig < a->h; rig++) 
-            for(col = 0; col < a->w; col++) 
+    for(liv = 0; liv < a->k; liv++)
+        for(rig = 0; rig < a->h; rig++)
+            for(col = 0; col < a->w; col++)
                 out->data[liv][rig][col] = a->data[liv][rig][col] - b->data[liv][rig][col];
 
     return out;
@@ -455,11 +455,11 @@ ip_mat * ip_mat_mul_scalar (ip_mat *a, float c)
         exit(1);
     }
 
-    out = ip_mat_create(a->h, a->w, a->k, 0);  
+    out = ip_mat_create(a->h, a->w, a->k, 0);
 
-    for(liv = 0; liv < a->k; liv++) 
-        for(rig = 0; rig < a->h; rig++) 
-            for(col = 0; col < a->w; col++) 
+    for(liv = 0; liv < a->k; liv++)
+        for(rig = 0; rig < a->h; rig++)
+            for(col = 0; col < a->w; col++)
                 out->data[liv][rig][col] = a->data[liv][rig][col] * c;
 
     return out;
@@ -479,13 +479,13 @@ ip_mat * ip_mat_add_scalar (ip_mat *a, float c)
         exit(1);
     }
 
-    out = ip_mat_create(a->h, a->w, a->k, 0); 
+    out = ip_mat_create(a->h, a->w, a->k, 0);
 
-    for(liv = 0; liv < out->k; liv++) 
+    for(liv = 0; liv < out->k; liv++)
     {
-        for(rig = 0; rig < out->h; rig++) 
+        for(rig = 0; rig < out->h; rig++)
         {
-            for(col = 0; col < out->w; col++) 
+            for(col = 0; col < out->w; col++)
             {
                 out->data[liv][rig][col] = (a->data[liv][rig][col]) + c;
             }
@@ -507,11 +507,11 @@ ip_mat * ip_mat_mean (ip_mat *a, ip_mat *b)
         exit(1);
     }
 
-    out = ip_mat_create(a->h, a->w, a->k, 0); 
+    out = ip_mat_create(a->h, a->w, a->k, 0);
 
-    for(liv = 0; liv < a->k; liv++) 
-        for(rig = 0; rig < a->h; rig++) 
-            for(col = 0; col < a->w; col++) 
+    for(liv = 0; liv < a->k; liv++)
+        for(rig = 0; rig < a->h; rig++)
+            for(col = 0; col < a->w; col++)
                 out->data[liv][rig][col] = (a->data[liv][rig][col] + b->data[liv][rig][col])/2;
 
     return out;
@@ -592,16 +592,16 @@ ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha) {
     ip_mat *x;
     unsigned int liv, rig, col;
     x = NULL;
-  
+
     if( ((a == NULL) || (b == NULL)) || ((a->h != b->h) || (a->w != b->w) || (a->k != b->k)) )
     {
         printf("Errore! IPMAT non valida/e\n");
-        
+
         ip_mat_free(a);
         ip_mat_free(b);
         exit(1);
     }
-    
+
     /* ho richiamato la funzione create per assegnare le tre dimensioni ed allocare stats e data */
     x = ip_mat_create(a->h, a->w, a->k, 100);  /*prima era scritto in, ma non esiste, allora ho messo a per coerenza con l'if. Controllare se è corretto*/
 
@@ -622,7 +622,7 @@ ip_mat * ip_mat_blend(ip_mat * a, ip_mat * b, float alpha) {
 
 
 
-/* 
+/*
 IP_MAT_BRIGHTEN
 Descrizione: aumenta la luminosità dell'immagine, aggiunge ad ogni pixel un certo valore.
 	         I parametri della funzione non subiscono modiche, il risultato viene salvato e restituito in output
@@ -932,13 +932,13 @@ ip_mat * create_average_filter(unsigned int h, unsigned int w, unsigned int k)
 
 /*
 CREATE_GAUSSIAN_FILTER
-Descrizione: Crea un filtro gaussiano per la rimozione del rumore 
+Descrizione: Crea un filtro gaussiano per la rimozione del rumore
 */
 ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, float sigma)
 {
     unsigned int liv, rig, col;
     ip_mat *filter;
-    float *somma; 
+    float *somma;
     float x, y;
     filter = NULL;
     filter = ip_mat_create(h, w, k, 0);
@@ -946,7 +946,7 @@ ip_mat * create_gaussian_filter(unsigned int h, unsigned int w, unsigned int k, 
     /*int centro = w / 2;*/
     /*per la calcolare la somma dei valori del kernel (filter -> data), necessaria per la normalizzazione*/
     /* abbiamo messo 3 perchè sulle specifiche del progetto è scritto che lavoreremo sempre con matrici data contenenti solo 3 canali per rappresentare il range di colori R G B */
-    
+
     somma = (float*)malloc(sizeof(float)*3);
 
     for (liv = 0; liv < 3; liv++)
