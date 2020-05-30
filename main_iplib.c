@@ -1,3 +1,13 @@
+/*
+    Gruppo: 
+        81 - Geeks
+    Componenti:
+        875469 Thomas Babato
+        876875 Yamina Boukhalfa
+        854725 Christian Piovesan
+        869938 Federico Salviato
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include "ip_lib.h"

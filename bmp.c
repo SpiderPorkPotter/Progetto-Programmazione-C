@@ -5539,7 +5539,6 @@ unsigned int *bm_load_palette(const char * filename, unsigned int *npal) {
     f = fopen(filename, "r");
     if(!f) return NULL;
 #endif
-
     fgets(buf, sizeof buf, f);
     if(!strncmp(buf, "JASC-PAL", 8)) {
         /* Paintshop Pro palette http://www.cryer.co.uk/file-types/p/pal.htm */

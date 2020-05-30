@@ -1,4 +1,14 @@
 /*
+    Gruppo: 
+        81 - Geeks
+    Componenti:
+        875469 Thomas Babato
+        876875 Yamina Boukhalfa
+        854725 Christian Piovesan
+        869938 Federico Salviato
+*/
+
+/*
  Laboratorio di programmazione A.A. 2019/2020
 
  Sebastiano Vascon
